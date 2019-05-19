@@ -13,6 +13,7 @@ import {
   ScaleLinear,
   axisRight,
   Axis,
+  interpolateString,
   axisBottom,
   axisLeft,
   mouse,
@@ -50,6 +51,18 @@ const lineFunc = (instance: LineCharts) => (line<LinePointDataType>()
         return y1
       })
 )
+
+function tweenDash(){
+  var l = this.getTotalLength(),
+      i = interpolateString("0," + l, l + "," + l);
+  return function (t: any) { return i(t); };
+}
+
+function transition(path: Selection<SVGPathElement, any, any, any>) {
+  path.transition()
+      .duration(2000)
+      .attrTween('stroke-dasharray', tweenDash);
+}
 
 
 export class LineCharts {
@@ -145,11 +158,10 @@ export class LineCharts {
       .each(function(d){
          D3Select(this)  // 這個this就是 各個包裹著各條line的g
           .append('path')
-          .transition()
-          .duration(1500)
           .attr('d', (b: LinePointDataType[])  => tLineFunc(d.datas))
           .attr('stroke', lineColors(d.name))
           .style('fill', 'none')
+          .call(transition)
           
       })
   }
