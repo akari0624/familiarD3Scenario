@@ -18,7 +18,8 @@ import {
   mouse,
   BaseType
 } from 'd3'
-import { LinePointDataType } from '../../types'
+import { LinePointDataType, LineDataType } from '../../types'
+import {flatMap} from '../../utils'
 
 function drawRightYAxis(instance: LineCharts): void {
   const { svgWidth, d3ishSVG, yMaxScaleLinear } = instance
@@ -36,16 +37,32 @@ function drawRightYAxis(instance: LineCharts): void {
     .text('均價')
 }
 
+
+const lineFunc = (instance: LineCharts) => (line<LinePointDataType>()
+      .x((d: LinePointDataType) => {
+        const x1 = instance.xScaleBand(d.date) + instance.xScaleBand.bandwidth() / 2
+        console.log('x1', x1)
+        return x1
+      })
+      .y((d: LinePointDataType) => {
+        const y1 = instance.yMaxScaleLinear(d.value)
+        console.log('y1', y1)
+        return y1
+      })
+)
+
+
 export class LineCharts {
   svgDom: HTMLOrSVGElement
   d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
   svgWidth: number
   svgHeight: number
   // 一條折線會是一個  LinePointDataType[], 一個 LinePointDataType是一個點， 一組折線會被一個g包起來
-  data: [LinePointDataType[]]
+  data: LineDataType[]
+  
   xScaleBand: ScaleBand<string>
-  xLine: ScaleBand<string>
   yMaxScaleLinear: ScaleLinear<number, number>
+
   yRightAxis: Axis<
     | number
     | {
@@ -56,7 +73,7 @@ export class LineCharts {
   lineFunc: Line<[LinePointDataType, LinePointDataType]>
   lineColors: ScaleOrdinal<string, string>
 
-  constructor(svgDom: HTMLOrSVGElement, data: [LinePointDataType[]]) {
+  constructor(svgDom: HTMLOrSVGElement, data: LineDataType[]) {
     this.svgDom = svgDom
     this.data = data
     const box = (svgDom as SVGElement).getBoundingClientRect()
@@ -64,48 +81,43 @@ export class LineCharts {
     this.svgHeight = box.height
   }
 
-  initD3shSVG() {
+  initD3ishSVG() {
     if (!this.d3ishSVG) {
       this.d3ishSVG = D3Select<SVGGElement, [LinePointDataType[]]>(this
         .svgDom as any)
     }
   }
 
-  setD2ishSVGFromOtherChart(
-    d3ishSvgFromOtherChart: Selection<SVGGElement, any, HTMLElement, any>
+  setD3ishSVGFromOtherChart(
+    d3ishSvgFromOtherChart: Selection<SVGGElement, any, HTMLElement, any>,
   ) {
     this.d3ishSVG = d3ishSvgFromOtherChart
   }
 
   prepareLineralAndAxis() {
     const { svgHeight: height, svgWidth: width, data } = this
-
     this.xScaleBand = scaleBand()
       .range([0, width])
       .padding(0.1)
-      .domain(data.map(d => d.date))
+      .domain(flatMap(data, (d: LineDataType) => d.datas.map(dd => dd.date)))
 
     this.yMaxScaleLinear = scaleLinear()
       .range([height, 0])
-      .domain([0, max(data.map(d => d.categories), d => d[0].value)])
+      .domain([0, max(flatMap(data, d => d.datas.map(dd => dd.value)), d => d)])
 
     this.yRightAxis = axisRight(this.yMaxScaleLinear)
 
-    this.xLine = scaleBand()
-      .rangeRound([0, width])
-      .padding(0.1)
-      .domain(data.map(d => d.date))
   }
 
-  prepareLineFunc = () => {
-    this.lineFunc = line<[LinePointDataType, LinePointDataType]>()
-      .x((d: [LinePointDataType, LinePointDataType], i1: number) => {
-        return this.xScaleBand(d[i1].date) + this.xScaleBand.bandwidth() / 2
-      })
-      .y((d: [LinePointDataType, LinePointDataType], i2: number) => {
-        return this.yMaxScaleLinear(d[i2].value)
-      })
-  }
+  // prepareLineFunc = () => {
+  //   this.lineFunc = line<[LinePointDataType, LinePointDataType]>()
+  //     .x((d: [LinePointDataType, LinePointDataType], i1: number) => {
+  //       return this.xScaleBand(d[i1].date) + this.xScaleBand.bandwidth()
+  //     })
+  //     .y((d: [LinePointDataType, LinePointDataType], i2: number) => {
+  //       return this.yMaxScaleLinear(d[i2].value)
+  //     })
+  // }
 
   prepareLineColors = () => {
     this.lineColors = scaleOrdinal(schemeCategory10)
@@ -122,19 +134,31 @@ export class LineCharts {
   drawTheLine = (lineColors: ScaleOrdinal<string, string>) => {
     const { d3ishSVG, data } = this
 
+    const tLineFunc = lineFunc(this)
+
     d3ishSVG
       .selectAll('.lines')
       .data(data)
       .enter()
       .append('g')
-      .attr('class', 'axis line')
-      .each(d => {
-        d3ishSVG
+      .attr('class', 'axis_line')
+      .each(function(d){
+         D3Select(this)  // 這個this就是 各個包裹著各條line的g
           .append('path')
-          .attr('d', b => this.lineFunc([[lineChartData[0], lineChartData[1]]]))
-          .attr('stroke', lineColors(d.name))
           .transition()
           .duration(1500)
+          .attr('d', (b: LinePointDataType[])  => tLineFunc(d.datas))
+          .attr('stroke', lineColors(d.name))
+          .style('fill', 'none')
+          
       })
+  }
+
+  draw () {
+    this.initD3ishSVG()
+    this.prepareLineralAndAxis()
+    drawRightYAxis(this)
+    this.prepareLineColors()
+    this.drawTheLine(this.lineColors)
   }
 }

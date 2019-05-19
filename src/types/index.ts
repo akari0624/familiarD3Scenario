@@ -6,9 +6,13 @@ export interface marginInPX {
 }
 
 export interface LinePointDataType {
-  date?: string,
-  name: string,
+  date: string,
   value: number,
+}
+
+export interface LineDataType {
+  name: string
+  datas: LinePointDataType[]
 }
 
 export interface BarCategoryDataType {
