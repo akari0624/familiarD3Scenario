@@ -1,9 +1,11 @@
 import { BarCharts } from './parts/barcharts'
+import { LineCharts } from './parts/linecharts'
 import { BarChartDataType } from './types'
 
 export default function familiarD3Scenario() {
   return {
-    BarChart: BarCharts
+    BarChart: BarCharts,
+    LineChart: LineCharts,
   }
 }
 
@@ -59,9 +61,47 @@ const testData: BarcharData[] = [
   },
 ]
 
+const transToLineData = (tdata: BarcharData[]) => {
+
+   const landLine = tdata.reduce((acc, curr) => {
+    const d = {date:'', value:0}
+    d.date = curr.date
+    d.value = curr.LineCategory[0].value
+    acc.datas.push(d)
+    return acc
+   }, {name:'土地均價', datas:[]})
+
+   const wholeBuildLine = tdata.reduce((acc, curr) => {
+    const d = {date:'', value:0}
+    d.date = curr.date
+    d.value = curr.LineCategory[1].value
+    acc.datas.push(d)
+    return acc
+   }, {name:'透天厝均', datas:[]})
+
+   const buildingLine = tdata.reduce((acc, curr) => {
+    const d = {date:'', value:0}
+    d.date = curr.date
+    d.value = curr.LineCategory[2].value
+    acc.datas.push(d)
+    return acc
+   }, {name:'區分建物均價', datas:[]})
+
+   return [landLine, wholeBuildLine, buildingLine]
+
+}
+
+const svgDom1 = document.getElementById('svg1')
 const barChart1 = new fD3Module.BarChart(
-  document.getElementById('svg1'),
+  svgDom1,
   testData
 )
 barChart1.initD3shSVG()
 barChart1.draw()
+
+const linesData = transToLineData(testData)
+const lineChart1 = new fD3Module.LineChart(svgDom1, linesData)
+
+lineChart1.setD3ishSVGFromOtherChart(barChart1.getTheD3ishSVG())
+lineChart1.draw()
+
