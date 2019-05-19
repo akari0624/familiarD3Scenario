@@ -6,7 +6,7 @@ export interface marginInPX {
 }
 
 export interface LinePointDataType {
-  date: string,
+  date?: string,
   name: string,
   value: number,
 }

@@ -63,4 +63,5 @@ const barChart1 = new fD3Module.BarChart(
   document.getElementById('svg1'),
   testData
 )
+barChart1.initD3shSVG()
 barChart1.draw()
