@@ -53,8 +53,8 @@ const lineFunc = (instance: LineCharts) => (line<LinePointDataType>()
 )
 
 function tweenDash(){
-  var l = this.getTotalLength(),
-      i = interpolateString("0," + l, l + "," + l);
+  const l = this.getTotalLength()
+  const i = interpolateString(`0, ${l}`, `${l}, ${l}`);
   return function (t: any) { return i(t); };
 }
 
@@ -122,16 +122,6 @@ export class LineCharts {
 
   }
 
-  // prepareLineFunc = () => {
-  //   this.lineFunc = line<[LinePointDataType, LinePointDataType]>()
-  //     .x((d: [LinePointDataType, LinePointDataType], i1: number) => {
-  //       return this.xScaleBand(d[i1].date) + this.xScaleBand.bandwidth()
-  //     })
-  //     .y((d: [LinePointDataType, LinePointDataType], i2: number) => {
-  //       return this.yMaxScaleLinear(d[i2].value)
-  //     })
-  // }
-
   prepareLineColors = () => {
     this.lineColors = scaleOrdinal(schemeCategory10)
       //     .domain(
@@ -156,13 +146,12 @@ export class LineCharts {
       .append('g')
       .attr('class', 'axis_line')
       .each(function(d){
-         D3Select(this)  // 這個this就是 各個包裹著各條line的g
+        D3Select(this)  // 這個this就是 各個包裹著各條line的g
           .append('path')
           .attr('d', (b: LinePointDataType[])  => tLineFunc(d.datas))
           .attr('stroke', lineColors(d.name))
           .style('fill', 'none')
           .call(transition)
-          
       })
   }
 

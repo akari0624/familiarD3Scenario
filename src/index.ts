@@ -94,7 +94,7 @@ const transToLineData = (tdata: BarcharData[]) => {
 const svgDom1 = document.getElementById('svg1')
 const barChart1 = new fD3Module.BarChart(
   svgDom1,
-  testData
+  testData,
 )
 barChart1.initD3shSVG()
 barChart1.draw()
