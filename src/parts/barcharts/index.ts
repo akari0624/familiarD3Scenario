@@ -28,7 +28,7 @@ import {
 } from '../../types'
 
 function drawBottomXAxis(instance: BarCharts): void {
-  const { svgHeight, d3ishSVG, xScaleBand } = instance
+  const { svgHeight, d3ishSVG, xScaleBand, margin } = instance
 
   d3ishSVG
     .append('g')
@@ -70,6 +70,7 @@ function drawRightYAxis(instance: BarCharts): void {
 }
 
 const wrapRect_G_ClassName = '.state'
+const wrapRect_G_ClassNameWithoutDot = wrapRect_G_ClassName.substring(1, wrapRect_G_ClassName.length)
 
 export class BarCharts {
   svgDom: HTMLOrSVGElement
@@ -186,10 +187,10 @@ export class BarCharts {
       .range(['#FF33CC', '#0070C0', '#00B050', '#671919', '#0b172b'])
   }
 
-  bindDataToG(){
+  bindDataToG() {
 
     this.barChartDataBind = this.d3ishSVG
-    .selectAll('.state')
+    .selectAll(wrapRect_G_ClassName)
     .data(this.data)
   }
 
@@ -199,7 +200,7 @@ export class BarCharts {
     this.barChartDataBind
       .enter()
       .append('g')
-      .attr('class', 'state')
+      .attr('class', wrapRect_G_ClassNameWithoutDot)
       .attr('transform', d => {
         const result = this.xScaleBand(d.date)
         return `translate( ${result}, 0)`
@@ -254,7 +255,6 @@ export class BarCharts {
     d3ishSVG
       .attr('width', svgWidth)
       .attr('height', svgHeight)
-      .append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
     this._prepareAxis()
