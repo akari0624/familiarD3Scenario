@@ -1,24 +1,25 @@
 import { BarCharts } from './parts/barcharts'
 import { LineCharts } from './parts/linecharts'
+import { PieCharts } from './parts/piecharts'
 import { BarChartDataType } from './types'
 
 export default function familiarD3Scenario() {
   return {
     BarChart: BarCharts,
     LineChart: LineCharts,
+    PieChart: PieCharts
   }
 }
 
 const fD3Module = familiarD3Scenario()
 
 interface lineData {
-  name: string,
-  value: number,
+  name: string
+  value: number
 }
 interface lineCategory {
-
   LineCategory: lineData[]
-} 
+}
 
 type BarcharData = BarChartDataType & lineCategory
 
@@ -58,44 +59,48 @@ const testData: BarcharData[] = [
       { name: '透天厝均價', value: 24.86 },
       { name: '區分建物均價', value: 15.33 }
     ]
-  },
+  }
 ]
 
 const transToLineData = (tdata: BarcharData[]) => {
+  const landLine = tdata.reduce(
+    (acc, curr) => {
+      const d = { date: '', value: 0 }
+      d.date = curr.date
+      d.value = curr.LineCategory[0].value
+      acc.datas.push(d)
+      return acc
+    },
+    { name: '土地均價', datas: [] }
+  )
 
-   const landLine = tdata.reduce((acc, curr) => {
-    const d = {date:'', value:0}
-    d.date = curr.date
-    d.value = curr.LineCategory[0].value
-    acc.datas.push(d)
-    return acc
-   }, {name:'土地均價', datas:[]})
+  const wholeBuildLine = tdata.reduce(
+    (acc, curr) => {
+      const d = { date: '', value: 0 }
+      d.date = curr.date
+      d.value = curr.LineCategory[1].value
+      acc.datas.push(d)
+      return acc
+    },
+    { name: '透天厝均', datas: [] }
+  )
 
-   const wholeBuildLine = tdata.reduce((acc, curr) => {
-    const d = {date:'', value:0}
-    d.date = curr.date
-    d.value = curr.LineCategory[1].value
-    acc.datas.push(d)
-    return acc
-   }, {name:'透天厝均', datas:[]})
+  const buildingLine = tdata.reduce(
+    (acc, curr) => {
+      const d = { date: '', value: 0 }
+      d.date = curr.date
+      d.value = curr.LineCategory[2].value
+      acc.datas.push(d)
+      return acc
+    },
+    { name: '區分建物均價', datas: [] }
+  )
 
-   const buildingLine = tdata.reduce((acc, curr) => {
-    const d = {date:'', value:0}
-    d.date = curr.date
-    d.value = curr.LineCategory[2].value
-    acc.datas.push(d)
-    return acc
-   }, {name:'區分建物均價', datas:[]})
-
-   return [landLine, wholeBuildLine, buildingLine]
-
+  return [landLine, wholeBuildLine, buildingLine]
 }
 
 const svgDom1 = document.getElementById('svg1')
-const barChart1 = new fD3Module.BarChart(
-  svgDom1,
-  testData,
-)
+const barChart1 = new fD3Module.BarChart(svgDom1, testData)
 barChart1.initD3shSVG()
 barChart1.draw()
 
@@ -105,3 +110,12 @@ const lineChart1 = new fD3Module.LineChart(svgDom1, linesData)
 lineChart1.setD3ishSVGFromOtherChart(barChart1.getTheD3ishSVG())
 lineChart1.draw()
 
+const svgDom2 = document.getElementById('svg2')
+const pieChart1 = new fD3Module.PieChart(svgDom2, [
+  { name: '土地均價', value: 54.21 },
+  { name: '透天厝均價', value: 24.86 },
+  { name: '區分建物均價', value: 15.33 }
+])
+
+pieChart1.initD3ishSVG()
+pieChart1.draw()

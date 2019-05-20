@@ -26,11 +26,7 @@ export interface BarChartDataType {
   categories: BarCategoryDataType[],
 }
 
-interface ArcInPieDataType {
+export interface ArcInPieDataType {
   name: string,
   value: number,
-}
-
-export interface PieChartDataType {
-  data: ArcInPieDataType[],
 }
