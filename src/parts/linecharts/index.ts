@@ -17,7 +17,7 @@ import {
   axisBottom,
   axisLeft,
   mouse,
-  BaseType
+  BaseType,
 } from 'd3'
 import { LinePointDataType, LineDataType } from '../../types'
 import {flatMap} from '../../utils'
@@ -86,6 +86,7 @@ export class LineCharts {
 
   lineFunc: Line<[LinePointDataType, LinePointDataType]>
   lineColors: ScaleOrdinal<string, string>
+  dataBinds: Selection<BaseType, LineDataType, SVGGElement, any>
 
   constructor(svgDom: HTMLOrSVGElement, data: LineDataType[]) {
     this.svgDom = svgDom
@@ -135,14 +136,19 @@ export class LineCharts {
       .range(['#FF33CC', '#0070C0', '#00B050', '#671919', '#0b172b'])
   }
 
-  drawTheLine = (lineColors: ScaleOrdinal<string, string>) => {
+  doDataBind = () => {
     const { d3ishSVG, data } = this
-
-    const tLineFunc = lineFunc(this)
-
+    this.dataBinds =
     d3ishSVG
       .selectAll('.lines')
       .data(data)
+  }
+
+  drawTheLine = (lineColors: ScaleOrdinal<string, string>) => {
+
+    const tLineFunc = lineFunc(this)
+
+    this.dataBinds
       .enter()
       .append('g')
       .attr('class', 'axis_line')
@@ -161,6 +167,7 @@ export class LineCharts {
     this.prepareLineralAndAxis()
     drawRightYAxis(this)
     this.prepareLineColors()
+    this.doDataBind()
     this.drawTheLine(this.lineColors)
   }
 }
