@@ -95,7 +95,7 @@ export class BarCharts {
     this.svgHeight = box.height
   }
 
-  initD3shSVG() {
+  initD3ishSVG() {
     if (!this.d3ishSVG) {
       this.d3ishSVG = D3Select<SVGGElement, BarChartDataType>(this
         .svgDom as any)
