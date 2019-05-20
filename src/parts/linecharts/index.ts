@@ -86,11 +86,10 @@ export class LineCharts {
 
   lineFunc: Line<[LinePointDataType, LinePointDataType]>
   lineColors: ScaleOrdinal<string, string>
-  dataBinds: Selection<BaseType, LineDataType, SVGGElement, any>
+  dataBinds: Selection<BaseType, LineDataType, SVGGElement, LinePointDataType[]>
 
-  constructor(svgDom: HTMLOrSVGElement, data: LineDataType[]) {
+  constructor(svgDom: HTMLOrSVGElement) {
     this.svgDom = svgDom
-    this.data = data
     const box = getClientRectWidthAndHeight(svgDom)
     this.svgWidth = box.width
     this.svgHeight = box.height
@@ -140,7 +139,7 @@ export class LineCharts {
     const { d3ishSVG, data } = this
     this.dataBinds =
     d3ishSVG
-      .selectAll('.lines')
+      .selectAll('.pathWrapperG')
       .data(data)
   }
 
@@ -151,7 +150,7 @@ export class LineCharts {
     this.dataBinds
       .enter()
       .append('g')
-      .attr('class', 'axis_line')
+      .attr('class', 'pathWrapperG')
       .each(function(d){
         D3Select(this)  // 這個this就是 各個包裹著各條line的g
           .append('path')
@@ -162,12 +161,28 @@ export class LineCharts {
       })
   }
 
-  draw () {
+  update_line = (lineColors: ScaleOrdinal<string, string>) => {
+    const tLineFunc = lineFunc(this)
+    this.dataBinds.select('path').attr('d', (b: LineDataType)  => tLineFunc(b.datas))
+    .attr('stroke', d => lineColors(d.name))
+    .style('fill', 'none')
+    .call(transition)
+  }
+
+  remove_line = () => {
+    this.dataBinds.exit().remove()
+  }
+
+  draw (data: LineDataType[]) {
+    this.data = data
     this.initD3ishSVG()
     this.prepareLineralAndAxis()
     drawRightYAxis(this)
     this.prepareLineColors()
     this.doDataBind()
     this.drawTheLine(this.lineColors)
+
+    this.update_line(this.lineColors)
+    this.remove_line()
   }
 }
