@@ -22,6 +22,7 @@ import {
   BaseType
 } from 'd3'
 import { marginInPX, BarChartDataType, LinePointDataType } from '../../types'
+import { getClientRectWidthAndHeight } from '../utils'
 
 function drawBottomXAxis(instance: BarCharts): void {
   const { svgHeight, d3ishSVG, xScaleBand, margin } = instance
@@ -38,7 +39,7 @@ function drawLeftYAxis(instance: BarCharts): void {
 
   d3ishSVG
     .append('g')
-    .attr('class', 'y axis')
+    .attr('class', 'y_axis')
     .call(axisLeft(yScaleLinear).ticks(5))
     .append('text')
     .style('fill', 'steelblue') // fill the text with the colour black
@@ -90,7 +91,7 @@ export class BarCharts {
   constructor(svgDom: HTMLOrSVGElement, data: BarChartDataType[]) {
     this.svgDom = svgDom
     this.data = data
-    const box = (svgDom as SVGElement).getBoundingClientRect()
+    const box = getClientRectWidthAndHeight(svgDom)
     this.svgWidth = box.width
     this.svgHeight = box.height
   }
@@ -114,7 +115,7 @@ export class BarCharts {
     this.margin = pMargins
   }
 
-  _prepareAxis = () => {
+  _prepareAxisAndScale = () => {
     const { svgWidth: width, svgHeight: height, data } = this
 
     this.xScaleBand = scaleBand()
@@ -124,7 +125,6 @@ export class BarCharts {
 
    
     this.xScaleOrdinal = scaleOrdinal<string, number>()
-      //    .range([0, width])
       .domain(data.map(d => d.date))
 
     this.yScaleLinear = scaleLinear()
@@ -198,7 +198,7 @@ export class BarCharts {
       .attr('height', svgHeight)
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-    this._prepareAxis()
+    this._prepareAxisAndScale()
 
 
     drawBottomXAxis(this)

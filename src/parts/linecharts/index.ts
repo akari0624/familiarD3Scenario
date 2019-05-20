@@ -21,6 +21,7 @@ import {
 } from 'd3'
 import { LinePointDataType, LineDataType } from '../../types'
 import {flatMap} from '../../utils'
+import { getClientRectWidthAndHeight } from '../utils'
 
 function drawRightYAxis(instance: LineCharts): void {
   const { svgWidth, d3ishSVG, yMaxScaleLinear } = instance
@@ -89,7 +90,7 @@ export class LineCharts {
   constructor(svgDom: HTMLOrSVGElement, data: LineDataType[]) {
     this.svgDom = svgDom
     this.data = data
-    const box = (svgDom as SVGElement).getBoundingClientRect()
+    const box = getClientRectWidthAndHeight(svgDom)
     this.svgWidth = box.width
     this.svgHeight = box.height
   }
