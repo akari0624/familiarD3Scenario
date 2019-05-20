@@ -19,7 +19,7 @@ import {
   axisBottom,
   axisLeft,
   mouse,
-  BaseType
+  BaseType,
 } from 'd3'
 import { marginInPX, BarChartDataType, LinePointDataType } from '../../types'
 import { getClientRectWidthAndHeight } from '../utils'
@@ -73,7 +73,7 @@ export class BarCharts {
   yMaxScaleLinear: ScaleLinear<number, number>
 
   tColors: ScaleOrdinal<string, string>
-  barChartDataBind: Selection<BaseType, BarChartDataType, SVGGElement, any>
+  dataBinds: Selection<BaseType, BarChartDataType, SVGGElement, any>
   theGsThatWrapTheRects: Selection<
     SVGGElement,
     BarChartDataType,
@@ -88,9 +88,8 @@ export class BarCharts {
   >
 
 
-  constructor(svgDom: HTMLOrSVGElement, data: BarChartDataType[]) {
+  constructor(svgDom: HTMLOrSVGElement) {
     this.svgDom = svgDom
-    this.data = data
     const box = getClientRectWidthAndHeight(svgDom)
     this.svgWidth = box.width
     this.svgHeight = box.height
@@ -148,14 +147,14 @@ export class BarCharts {
   
 
   bindDataToG() {
-    this.barChartDataBind = this.d3ishSVG
+    this.dataBinds = this.d3ishSVG
       .selectAll(wrapRect_G_ClassName)
       .data(this.data)
   }
 
-  drawGsThatToWrapTheRect() {
+  enter_drawNewGsThatToWrapTheRect() {
     // 包住 rect的 g
-    this.theGsThatWrapTheRects = this.barChartDataBind
+    this.theGsThatWrapTheRects = this.dataBinds
       .enter()
       .append('g')
       .attr('class', wrapRect_G_ClassNameWithoutDot)
@@ -188,9 +187,37 @@ export class BarCharts {
       )
   }
 
-  
+  update_updateExistedBar = () => {
 
-  draw = () => {
+    this.dataBinds.select('rect').attr('width', this.xScaleBand.bandwidth())
+    .attr('x', d => this.xScaleOrdinal(d.date))
+    .attr('y', this.svgHeight)
+    .style('fill', (d: BarChartDataType) =>
+      this.tColors(d.categories[0].name)
+    ) .transition()
+    .duration(1000)
+    //由下往上長
+    .attr('y', d => this.yScaleLinear(d.categories[0].value))
+    .attr(
+      'height',
+      d => this.svgHeight - this.yScaleLinear(d.categories[0].value)
+    )
+  }
+
+  exit_removeNoDataCorrespondedBar = () => {
+    this.dataBinds
+    .exit()
+    .transition()
+    .duration(1000)
+    .attr(
+      'height',
+      0,
+    )
+    .remove()
+  }
+
+  draw = (data: BarChartDataType[]) => {
+    this.data = data
     const { svgWidth, svgHeight, margin, d3ishSVG } = this
 
     d3ishSVG
@@ -205,8 +232,13 @@ export class BarCharts {
     drawLeftYAxis(this)
 
     this.bindDataToG()
-    this.drawGsThatToWrapTheRect()
+
+    this.enter_drawNewGsThatToWrapTheRect()
     this.drawRectInTheGs()
     this.setRectTransition()
+
+    this.update_updateExistedBar()
+
+    this.exit_removeNoDataCorrespondedBar()
   }
 }
