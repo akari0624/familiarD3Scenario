@@ -79,6 +79,7 @@ npm run ${script}WithBabel
 
 ### 未完成
   - ~~折線圖~~
-  - 圓餅圖
-  - 事件榜定
+  - ~~圓餅圖~~
+  - 事件綁定
   - exit, update
+  - legend區
