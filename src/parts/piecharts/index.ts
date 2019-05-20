@@ -1,4 +1,4 @@
-import { select as D3Select, Selection, schemeCategory10, scaleOrdinal, arc, Arc, DefaultArcObject, pie, Pie, BaseType, PieArcDatum } from 'd3'
+import { select as D3Select, Selection, schemeCategory10, scaleOrdinal, arc, Arc, DefaultArcObject, pie, Pie, BaseType, PieArcDatum, interpolate as D3Interpolate } from 'd3'
 import { ArcInPieDataType } from '../../types'
 import { getClientRectWidthAndHeight } from '../utils'
 
@@ -6,6 +6,17 @@ import { getClientRectWidthAndHeight } from '../utils'
 
 
 const threeColorForPirChart = scaleOrdinal<string>().range(['#ff7f50', '#7f55d4', '#6fbfad'])
+
+const getArcTween = (
+  arc_layout: Arc<any, PieArcDatum<number>>,
+  _current: number,
+) => (b: any) => {
+  let i = D3Interpolate(_current, b)
+  _current = i(0)
+  return (t: any) => {
+    return arc_layout(i(t))
+  }
+}
 
 export class PieCharts {
 
@@ -21,6 +32,7 @@ export class PieCharts {
   theWholeWrapperG: Selection<SVGGElement, any, HTMLElement, any>
   dataBinds: Selection<BaseType, {}, SVGGElement, any>
   newEnterGs: Selection<SVGGElement, {}, SVGGElement, any>
+  arcTweenFunc: (b: any) => (t: any) => string
 
   constructor(svgDom: HTMLOrSVGElement, data: ArcInPieDataType[]) {
     this.svgDom = svgDom
@@ -59,6 +71,8 @@ export class PieCharts {
       return d.value;
     })
 
+    this.arcTweenFunc = getArcTween(this.arcFunc, 0)
+
   }
 
 
@@ -88,6 +102,9 @@ export class PieCharts {
       .attr('fill', (d, i: number) => {
         return threeColorForPirChart(`${i}`);
       })
+      .transition()
+      .duration(750)
+      .attrTween('d', this.arcTweenFunc)
   }
 
   draw() {
