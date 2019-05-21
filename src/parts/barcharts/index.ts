@@ -47,7 +47,7 @@ function drawLeftYAxis(instance: BarCharts): void {
   if (isFirstDraw) {
     d3ishSVG
       .append('g')
-      .attr('class', 'y_axis')
+      .attr('class', 'y_axis_left')
       .call(axisLeft(yScaleLinear).ticks(5))
       .append('text')
       .style('fill', 'steelblue') // fill the text with the colour black
@@ -57,7 +57,7 @@ function drawLeftYAxis(instance: BarCharts): void {
       .style('text-anchor', 'end')
       .text('案件數')
   }else {
-    d3ishSVG.select('y_axis').call(axisLeft(yScaleLinear).ticks(5))
+    d3ishSVG.select('y_axis_left').call(axisLeft(yScaleLinear).ticks(5))
   }
 }
 
