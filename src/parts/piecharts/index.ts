@@ -33,11 +33,10 @@ export class PieCharts {
   dataBinds: Selection<BaseType, {}, SVGGElement, any>
   newEnterGs: Selection<SVGGElement, {}, SVGGElement, any>
   arcTweenFunc: (b: any) => (t: any) => string
+  isFirstBind: boolean = true
 
-  constructor(svgDom: HTMLOrSVGElement, data: ArcInPieDataType[]) {
+  constructor(svgDom: HTMLOrSVGElement) {
     this.svgDom = svgDom
-    this.data = data
-
     const box = getClientRectWidthAndHeight(svgDom)
     this.svgWidth = box.width
     this.svgHeight = box.height
@@ -77,13 +76,17 @@ export class PieCharts {
 
 
   appendOutWrapperGAndSetTheStartDrawCenter() {
-    this.theWholeWrapperG =
-      this.d3ishSVG
-      .append('g')
-      .attr('transform', `translate(${this.svgWidth / 2}, ${this.svgHeight / 2})`);
+    if(this.isFirstBind){
+      this.theWholeWrapperG =
+        this.d3ishSVG
+        .append('g')
+        .attr('transform', `translate(${this.svgWidth / 2}, ${this.svgHeight / 2})`);
+
+      this.isFirstBind = false
+    }
   }
 
-  startToBindBeforeFirstEnter() {
+  startToBindBeforeEnter() {
     this.dataBinds =
     this.theWholeWrapperG
     .selectAll('.arc')
@@ -107,12 +110,31 @@ export class PieCharts {
       .attrTween('d', this.arcTweenFunc)
   }
 
-  draw() {
+  doUpdate() {
+    this.theWholeWrapperG
+    .selectAll('.arc')
+    .select('path')
+    .attr('d', this.arcFunc)
+      .attr('fill', (d, i: number) => {
+        return threeColorForPirChart(`${i}`);
+      })
+      .transition()
+      .duration(750)
+      .attrTween('d', this.arcTweenFunc)
+  }
+
+  doExitRemove() {
+    this.dataBinds.exit().remove()
+  }
+
+  draw(data: ArcInPieDataType[]) {
+    this.data = data
     this.initD3ishSVG()
     this.initNeededFunc()
     this.appendOutWrapperGAndSetTheStartDrawCenter()
-    this.startToBindBeforeFirstEnter()
+    this.startToBindBeforeEnter()
     this.doEnter()
-  
+    this.doExitRemove()
+    this.doUpdate()
   }
 }
