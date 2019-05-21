@@ -25,29 +25,40 @@ import { marginInPX, BarChartDataType, LinePointDataType } from '../../types'
 import { getClientRectWidthAndHeight } from '../utils'
 
 function drawBottomXAxis(instance: BarCharts): void {
-  const { svgHeight, d3ishSVG, xScaleBand, margin } = instance
+  const { svgHeight, d3ishSVG, xScaleBand, margin, isFirstDraw } = instance
 
-  d3ishSVG
-    .append('g')
-    .attr('class', 'x_axis')
+  if (isFirstDraw) {
+    d3ishSVG
+      .append('g')
+      .attr('class', 'x_axis')
+      .attr('transform', `translate(0, ${svgHeight})`)
+      .call(axisBottom(xScaleBand))
+  }else {
+    d3ishSVG
+    .select('.x_axis')
     .attr('transform', `translate(0, ${svgHeight})`)
     .call(axisBottom(xScaleBand))
+  }
 }
 
 function drawLeftYAxis(instance: BarCharts): void {
-  const { yScaleLinear, d3ishSVG } = instance
+  const { yScaleLinear, d3ishSVG, isFirstDraw } = instance
 
-  d3ishSVG
-    .append('g')
-    .attr('class', 'y_axis')
-    .call(axisLeft(yScaleLinear).ticks(5))
-    .append('text')
-    .style('fill', 'steelblue') // fill the text with the colour black
-    .attr('transform', 'rotate(-90)')
-    .attr('y', 6)
-    .attr('dy', '.71em')
-    .style('text-anchor', 'end')
-    .text('案件數')
+  if (isFirstDraw) {
+    d3ishSVG
+      .append('g')
+      .attr('class', 'y_axis')
+      .call(axisLeft(yScaleLinear).ticks(5))
+      .append('text')
+      .style('fill', 'steelblue') // fill the text with the colour black
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 6)
+      .attr('dy', '.71em')
+      .style('text-anchor', 'end')
+      .text('案件數')
+  }else {
+    d3ishSVG.select('y_axis').call(axisLeft(yScaleLinear).ticks(5))
+  }
 }
 
 
@@ -86,6 +97,7 @@ export class BarCharts {
     SVGGElement,
     BarChartDataType
   >
+  isFirstDraw: boolean = true
 
 
   constructor(svgDom: HTMLOrSVGElement) {
@@ -225,6 +237,7 @@ export class BarCharts {
   }
 
   draw = (data: BarChartDataType[]) => {
+   
     this.data = data
     const { svgWidth, svgHeight, margin, d3ishSVG } = this
 
@@ -234,10 +247,13 @@ export class BarCharts {
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
     this._prepareAxisAndScale()
-
+    
 
     drawBottomXAxis(this)
     drawLeftYAxis(this)
+    if (this.isFirstDraw) {
+      this.isFirstDraw = false
+    }
 
     this.bindDataToG()
 
