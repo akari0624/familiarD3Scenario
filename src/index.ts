@@ -165,14 +165,16 @@ lineChart1.setD3ishSVGFromOtherChart(barChart1.getTheD3ishSVG())
 lineChart1.draw(linesData)
 
 const svgDom2 = document.getElementById('svg2')
-const pieChart1 = new fD3Module.PieChart(svgDom2, [
+const pieChart1 = new fD3Module.PieChart(svgDom2)
+
+const testPieChartData = [
   { name: '土地均價', value: 54.21 },
   { name: '透天厝均價', value: 24.86 },
   { name: '區分建物均價', value: 15.33 }
-])
+]
 
 pieChart1.initD3ishSVG()
-pieChart1.draw()
+pieChart1.draw(testPieChartData)
 
 
 const svgDom3 = document.getElementById('svg3')
@@ -184,9 +186,11 @@ setTimeout(() => {
   barChart1.draw(barTestData2)
 
   const linesData2 = transToLineData(barTestData2)
-  lineChart1.draw(linesData2)
-}, 5555)
+  lineChart1.draw(linesData2.slice(0, 2))
+  pieChart1.draw(testPieChartData.slice(0, 2))
+}, 3000)
 
 setTimeout(() => {
   barChart1.draw(barTestData3)
-}, 10000)
+  pieChart1.draw(testPieChartData)
+}, 5500)
