@@ -24,19 +24,27 @@ import {flatMap} from '../../utils'
 import { getClientRectWidthAndHeight } from '../utils'
 
 function drawRightYAxis(instance: LineCharts): void {
-  const { svgWidth, d3ishSVG, yMaxScaleLinear } = instance
-  d3ishSVG
-    .append('g')
-    .attr('class', 'y_axis')
-    .attr('transform', `translate(${svgWidth},0)`)
-    .call(axisRight(yMaxScaleLinear).ticks(5))
-    .append('text')
-    .style('fill', 'steelblue') // fill the text with the colour black
-    .attr('transform', 'rotate(-90)')
-    .attr('y', -10)
-    .attr('dy', '.71em')
-    .style('text-anchor', 'end')
-    .text('均價')
+  const { svgWidth, d3ishSVG, yMaxScaleLinear, isFirstDraw } = instance
+  if (isFirstDraw) {
+
+    d3ishSVG
+      .append('g')
+      .attr('class', 'y_axis_right')
+      .attr('transform', `translate(${svgWidth},0)`)
+      .call(axisRight(yMaxScaleLinear).ticks(5))
+      .append('text')
+      .style('fill', 'steelblue') // fill the text with the colour black
+      .attr('transform', 'rotate(-90)')
+      .attr('y', -10)
+      .attr('dy', '.71em')
+      .style('text-anchor', 'end')
+      .text('均價')
+  }else {
+    d3ishSVG
+      .select('y_axis_right')
+      .attr('transform', `translate(${svgWidth},0)`)
+      .call(axisRight(yMaxScaleLinear).ticks(5))
+  }
 }
 
 
@@ -87,6 +95,7 @@ export class LineCharts {
   lineFunc: Line<[LinePointDataType, LinePointDataType]>
   lineColors: ScaleOrdinal<string, string>
   dataBinds: Selection<BaseType, LineDataType, SVGGElement, LinePointDataType[]>
+  isFirstDraw = true
 
   constructor(svgDom: HTMLOrSVGElement) {
     this.svgDom = svgDom
@@ -178,6 +187,9 @@ export class LineCharts {
     this.initD3ishSVG()
     this.prepareLineralAndAxis()
     drawRightYAxis(this)
+    if (this.isFirstDraw) {
+      this.isFirstDraw = false
+    }
     this.prepareLineColors()
     this.doDataBind()
     this.drawTheLine(this.lineColors)
