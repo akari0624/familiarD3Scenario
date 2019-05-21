@@ -189,7 +189,15 @@ export class BarCharts {
 
   update_updateExistedBar = () => {
 
-    this.dataBinds.select('rect').attr('width', this.xScaleBand.bandwidth())
+    // 移動g
+    this.dataBinds.attr('transform', d => {
+      const result = this.xScaleBand(d.date)
+      return `translate( ${result}, 0)`
+    })
+
+    // update not enter rect
+    this.dataBinds
+    .select('rect').attr('width', this.xScaleBand.bandwidth())
     .attr('x', d => this.xScaleOrdinal(d.date))
     .attr('y', this.svgHeight)
     .style('fill', (d: BarChartDataType) =>
@@ -207,12 +215,12 @@ export class BarCharts {
   exit_removeNoDataCorrespondedBar = () => {
     this.dataBinds
     .exit()
-    .transition()
-    .duration(1000)
-    .attr(
-      'height',
-      0,
-    )
+    // .transition()
+    // .duration(1000)
+    // .attr(
+    //   'height',
+    //   0,
+    // )
     .remove()
   }
 
@@ -233,12 +241,13 @@ export class BarCharts {
 
     this.bindDataToG()
 
+    this.exit_removeNoDataCorrespondedBar()
+
     this.enter_drawNewGsThatToWrapTheRect()
     this.drawRectInTheGs()
     this.setRectTransition()
 
     this.update_updateExistedBar()
 
-    this.exit_removeNoDataCorrespondedBar()
   }
 }
