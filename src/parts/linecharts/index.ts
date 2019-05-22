@@ -41,7 +41,7 @@ function drawRightYAxis(instance: LineCharts): void {
       .text('均價')
   }else {
     d3ishSVG
-      .select('y_axis_right')
+      .select('.y_axis_right')
       .attr('transform', `translate(${svgWidth},0)`)
       .call(axisRight(yMaxScaleLinear).ticks(5))
   }
