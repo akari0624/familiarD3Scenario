@@ -31,23 +31,24 @@ function drawBottomXAxis(instance: BarCharts): void {
     d3ishSVG
       .append('g')
       .attr('class', 'x_axis')
-      .attr('transform', `translate(0, ${svgHeight})`)
+      .attr('transform', `translate(${margin.left}, ${svgHeight - margin.top})`)
       .call(axisBottom(xScaleBand))
   }else {
     d3ishSVG
     .select('.x_axis')
-    .attr('transform', `translate(0, ${svgHeight})`)
+    .attr('transform', `translate(${margin.left}, ${svgHeight - margin.top})`)
     .call(axisBottom(xScaleBand))
   }
 }
 
 function drawLeftYAxis(instance: BarCharts): void {
-  const { yScaleLinear, d3ishSVG, isFirstDraw } = instance
+  const { yScaleLinear, d3ishSVG, isFirstDraw, margin } = instance
 
   if (isFirstDraw) {
     d3ishSVG
       .append('g')
       .attr('class', 'y_axis_left')
+      .attr('transform', `translate(${margin.left}, 0)`)
       .call(axisLeft(yScaleLinear).ticks(5))
       .append('text')
       .style('fill', 'steelblue') // fill the text with the colour black
@@ -73,7 +74,7 @@ export class BarCharts {
   svgDom: HTMLOrSVGElement
   d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
   data: BarChartDataType[]
-  margin: marginInPX = { top: 20, right: 40, bottom: 60, left: 40 }
+  margin: marginInPX = { top: 40, right: 40, bottom: 40, left: 40 }
   svgWidth: number
   svgHeight: number
 
@@ -127,10 +128,10 @@ export class BarCharts {
   }
 
   _prepareAxisAndScale = () => {
-    const { svgWidth: width, svgHeight: height, data } = this
+    const { svgWidth: width, svgHeight: height, data, margin } = this
 
     this.xScaleBand = scaleBand()
-      .range([0, width])
+      .range([0, width - margin.left])
       .padding(0.1)
       .domain(data.map(d => d.date))
 
@@ -139,7 +140,7 @@ export class BarCharts {
       .domain(data.map(d => d.date))
 
     this.yScaleLinear = scaleLinear()
-      .range([height, 0])
+      .range([height - margin.top, 0])
       .domain([0, max(data, d => d.categories[0].value)])
 
   
@@ -172,7 +173,7 @@ export class BarCharts {
       .attr('class', wrapRect_G_ClassNameWithoutDot)
       .attr('transform', d => {
         const result = this.xScaleBand(d.date)
-        return `translate( ${result}, 0)`
+        return `translate( ${result + this.margin.left}, 0)`
       })
   }
 
@@ -195,7 +196,7 @@ export class BarCharts {
       .attr('y', d => this.yScaleLinear(d.categories[0].value))
       .attr(
         'height',
-        d => this.svgHeight - this.yScaleLinear(d.categories[0].value)
+        d => this.svgHeight - this.margin.top - this.yScaleLinear(d.categories[0].value)
       )
   }
 
@@ -204,7 +205,7 @@ export class BarCharts {
     // 移動g
     this.dataBinds.attr('transform', d => {
       const result = this.xScaleBand(d.date)
-      return `translate( ${result}, 0)`
+      return `translate( ${result + this.margin.left}, 0)`
     })
 
     // update not enter rect
@@ -220,7 +221,7 @@ export class BarCharts {
     .attr('y', d => this.yScaleLinear(d.categories[0].value))
     .attr(
       'height',
-      d => this.svgHeight - this.yScaleLinear(d.categories[0].value)
+      d => this.svgHeight - this.margin.top -  this.yScaleLinear(d.categories[0].value)
     )
   }
 
