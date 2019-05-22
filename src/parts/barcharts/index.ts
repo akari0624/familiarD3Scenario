@@ -57,7 +57,7 @@ function drawLeftYAxis(instance: BarCharts): void {
       .style('text-anchor', 'end')
       .text('案件數')
   }else {
-    d3ishSVG.select('y_axis_left').call(axisLeft(yScaleLinear).ticks(5))
+    d3ishSVG.select('.y_axis_left').call(axisLeft(yScaleLinear).ticks(5))
   }
 }
 
