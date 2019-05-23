@@ -19,18 +19,18 @@ import {
   mouse,
   BaseType,
 } from 'd3'
-import { LinePointDataType, LineDataType } from '../../types'
+import { LinePointDataType, LineDataType, marginInPX } from '../../types'
 import {flatMap} from '../../utils'
 import { getClientRectWidthAndHeight } from '../utils'
 
 function drawRightYAxis(instance: LineCharts): void {
-  const { svgWidth, d3ishSVG, yMaxScaleLinear, isFirstDraw } = instance
+  const { svgWidth, d3ishSVG, yMaxScaleLinear, isFirstDraw, margin } = instance
   if (isFirstDraw) {
 
     d3ishSVG
       .append('g')
       .attr('class', 'y_axis_right')
-      .attr('transform', `translate(${svgWidth},0)`)
+      .attr('transform', `translate(${svgWidth - margin.right},0)`)
       .call(axisRight(yMaxScaleLinear).ticks(5))
       .append('text')
       .style('fill', 'steelblue') // fill the text with the colour black
@@ -42,7 +42,7 @@ function drawRightYAxis(instance: LineCharts): void {
   }else {
     d3ishSVG
       .select('.y_axis_right')
-      .attr('transform', `translate(${svgWidth},0)`)
+      .attr('transform', `translate(${svgWidth - margin.right},0)`)
       .call(axisRight(yMaxScaleLinear).ticks(5))
   }
 }
@@ -50,7 +50,7 @@ function drawRightYAxis(instance: LineCharts): void {
 
 const lineFunc = (instance: LineCharts) => (line<LinePointDataType>()
       .x((d: LinePointDataType) => {
-        const x1 = instance.xScaleBand(d.date) + instance.xScaleBand.bandwidth() / 2
+        const x1 = instance.xScaleBand(d.date) + instance.xScaleBand.bandwidth() / 2 + (instance.margin.left + instance.margin.right) /2
         console.log('x1', x1)
         return x1
       })
@@ -91,7 +91,7 @@ export class LineCharts {
         valueOf(): number
       }
   >
-
+  margin: marginInPX = { top: 40, right: 40, bottom: 40, left: 40 }
   lineFunc: Line<[LinePointDataType, LinePointDataType]>
   lineColors: ScaleOrdinal<string, string>
   dataBinds: Selection<BaseType, LineDataType, SVGGElement, LinePointDataType[]>
@@ -108,6 +108,11 @@ export class LineCharts {
     if (!this.d3ishSVG) {
       this.d3ishSVG = D3Select<SVGGElement, [LinePointDataType[]]>(this
         .svgDom as any)
+
+      this.d3ishSVG
+        .attr('width', this.svgWidth)
+        .attr('height', this.svgHeight)
+        .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
     }
   }
 
@@ -118,14 +123,14 @@ export class LineCharts {
   }
 
   prepareLineralAndAxis() {
-    const { svgHeight: height, svgWidth: width, data } = this
+    const { svgHeight: height, svgWidth: width, data, margin } = this
     this.xScaleBand = scaleBand()
-      .range([0, width])
+      .range([0, width - margin.left - margin.right])
       .padding(0.1)
       .domain(flatMap(data, (d: LineDataType) => d.datas.map(dd => dd.date)))
 
     this.yMaxScaleLinear = scaleLinear()
-      .range([height, 0])
+      .range([height - margin.bottom, 0])
       .domain([0, max(flatMap(data, d => d.datas.map(dd => dd.value)), d => d)])
 
     this.yRightAxis = axisRight(this.yMaxScaleLinear)
@@ -185,6 +190,8 @@ export class LineCharts {
   draw (data: LineDataType[]) {
     this.data = data
     this.initD3ishSVG()
+
+
     this.prepareLineralAndAxis()
     drawRightYAxis(this)
     if (this.isFirstDraw) {

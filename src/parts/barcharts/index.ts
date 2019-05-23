@@ -31,12 +31,12 @@ function drawBottomXAxis(instance: BarCharts): void {
     d3ishSVG
       .append('g')
       .attr('class', 'x_axis')
-      .attr('transform', `translate(${margin.left}, ${svgHeight - margin.top})`)
+      .attr('transform', `translate(${margin.left}, ${svgHeight - margin.bottom})`)
       .call(axisBottom(xScaleBand))
   }else {
     d3ishSVG
     .select('.x_axis')
-    .attr('transform', `translate(${margin.left}, ${svgHeight - margin.top})`)
+    .attr('transform', `translate(${margin.left}, ${svgHeight - margin.bottom})`)
     .call(axisBottom(xScaleBand))
   }
 }
@@ -131,7 +131,7 @@ export class BarCharts {
     const { svgWidth: width, svgHeight: height, data, margin } = this
 
     this.xScaleBand = scaleBand()
-      .range([0, width - margin.left])
+      .range([0, width - margin.left - margin.right])
       .padding(0.1)
       .domain(data.map(d => d.date))
 
