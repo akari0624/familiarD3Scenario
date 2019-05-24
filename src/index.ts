@@ -26,7 +26,11 @@ type BarcharData = BarChartDataType & lineCategory
 const testData: BarcharData[] = [
   {
     date: '10705',
-    categories: [{ name: '土地+建物的案件量', value: 300 }],
+    categories: [
+      { date: '10705', name: '土地+建物的案件量', value: 40 },
+      { date: '10705', name: '建物的案件量', value: 20 },
+     
+    ],
     LineCategory: [
       { name: '土地均價', value: 77.71 },
       { name: '透天厝均價', value: 23.29 },
@@ -35,16 +39,25 @@ const testData: BarcharData[] = [
   },
   {
     date: '10706',
-    categories: [{ name: '土地+建物的案件量', value: 20 }],
+    categories: [
+      { date: '10706', name: '土地+建物的案件量', value: 20 },
+      { date: '10706', name: '建物的案件量', value: 20 },
+     
+    ],
     LineCategory: [
       { name: '土地均價', value: 54.21 },
       { name: '透天厝均價', value: 24.86 },
-      { name: '區分建物均價', value: 15.33 }
+      { name: '區分建物均價', value: 15.8 }
+
     ]
   },
   {
     date: '10707',
-    categories: [{ name: '土地+建物的案件量', value: 80 }],
+    categories: [
+      { date: '10707', name: '土地+建物的案件量', value: 80 },
+      { date: '10707', name: '建物的案件量', value: 50 },
+     
+    ],
     LineCategory: [
       { name: '土地均價', value: 54.21 },
       { name: '透天厝均價', value: 24.86 },
@@ -53,7 +66,11 @@ const testData: BarcharData[] = [
   },
   {
     date: '10708',
-    categories: [{ name: '土地+建物的案件量', value: 120 }],
+    categories: [
+      { date: '10708', name: '土地+建物的案件量', value: 120 },
+      { date: '10708', name: '建物的案件量', value: 20 },
+     
+    ],
     LineCategory: [
       { name: '土地均價', value: 54.21 },
       { name: '透天厝均價', value: 24.86 },
@@ -65,7 +82,10 @@ const testData: BarcharData[] = [
 const barTestData2: BarcharData[] = [
   {
     date: '10705',
-    categories: [{ name: '土地+建物的案件量', value: 200 }],
+    categories: [
+      { date: '10705', name: '土地+建物的案件量', value: 200 },
+      { date: '10705', name: '建物的案件量', value: 20 }
+    ],
     LineCategory: [
       { name: '土地均價', value: 100.71 },
       { name: '透天厝均價', value: 70.29 },
@@ -74,7 +94,10 @@ const barTestData2: BarcharData[] = [
   },
   {
     date: '10706',
-    categories: [{ name: '土地+建物的案件量', value: 300 }],
+    categories: [
+      { date: '10706', name: '土地+建物的案件量', value: 300 },
+      { date: '10706', name: '建物的案件量', value: 20 }
+    ],
     LineCategory: [
       { name: '土地均價', value: 20.71 },
       { name: '透天厝均價', value: 23.29 },
@@ -83,7 +106,10 @@ const barTestData2: BarcharData[] = [
   },
   {
     date: '10707',
-    categories: [{ name: '土地+建物的案件量', value: 120 }],
+    categories: [
+      { date: '10707', name: '土地+建物的案件量', value: 120 },
+      { date: '10707', name: '建物的案件量', value: 20 }
+    ],
     LineCategory: [
       { name: '土地均價', value: 37.71 },
       { name: '透天厝均價', value: 63.29 },
@@ -92,7 +118,10 @@ const barTestData2: BarcharData[] = [
   },
   {
     date: '10708',
-    categories: [{ name: '土地+建物的案件量', value: 20 }],
+    categories: [
+      { date: '10708', name: '土地+建物的案件量', value: 20 },
+      { date: '10708', name: '建物的案件量', value: 40 }
+    ],
     LineCategory: [
       { name: '土地均價', value: 27.71 },
       { name: '透天厝均價', value: 50.29 },
@@ -101,19 +130,43 @@ const barTestData2: BarcharData[] = [
   }
 ]
 
-const barTestData3: BarChartDataType[] = [
+const barTestData3: BarcharData[] = [
   {
     date: '10705',
-    categories: [{ name: '土地+建物的案件量', value: 200 }],
+    categories: [
+      { date: '10705', name: '土地+建物的案件量', value: 200 },
+      { date: '10705', name: '建物的案件量', value: 20 }
+    ],
+    LineCategory: [
+      { name: '土地均價', value: 27.71 },
+      { name: '透天厝均價', value: 50.29 },
+      { name: '區分建物均價', value: 200.8 }
+    ]
   },
   {
     date: '10706',
-    categories: [{ name: '土地+建物的案件量', value: 300 }],
+    categories: [
+      { date: '10706', name: '土地+建物的案件量', value: 300 },
+      { date: '10706', name: '建物的案件量', value: 20 }
+    ],
+    LineCategory: [
+      { name: '土地均價', value: 200.71 },
+      { name: '透天厝均價', value: 63.29 },
+      { name: '區分建物均價', value: 5.8 }
+    ]
   },
   {
     date: '10707',
-    categories: [{ name: '土地+建物的案件量', value: 120 }],
-  },
+    categories: [
+      { date: '10707', name: '土地+建物的案件量', value: 120 },
+      { date: '10707', name: '建物的案件量', value: 20 }
+    ],
+    LineCategory: [
+      { name: '土地均價', value: 47.71 },
+      { name: '透天厝均價', value: 63.29 },
+      { name: '區分建物均價', value: 32.8 }
+    ]
+  }
 ]
 
 const transToLineData = (tdata: BarcharData[]) => {
@@ -156,6 +209,7 @@ const transToLineData = (tdata: BarcharData[]) => {
 const svgDom1 = document.getElementById('svg1')
 const barChart1 = new fD3Module.BarChart(svgDom1)
 barChart1.initD3ishSVG()
+barChart1.setOnRectClick(d => pieChart1.draw(barTestData3[0].LineCategory))
 barChart1.draw(testData)
 
 const linesData = transToLineData(testData)
@@ -176,7 +230,6 @@ const testPieChartData = [
 pieChart1.initD3ishSVG()
 pieChart1.draw(testPieChartData)
 
-
 const svgDom3 = document.getElementById('svg3')
 const barChart2 = new fD3Module.BarChart(svgDom3)
 barChart2.initD3ishSVG()
@@ -192,5 +245,7 @@ setTimeout(() => {
 
 setTimeout(() => {
   barChart1.draw(barTestData3)
+  const linesData3 = transToLineData(barTestData3)
+  lineChart1.draw(linesData3)
   pieChart1.draw(testPieChartData)
 }, 5500)

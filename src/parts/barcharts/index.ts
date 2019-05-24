@@ -21,8 +21,9 @@ import {
   mouse,
   BaseType,
 } from 'd3'
-import { marginInPX, BarChartDataType, LinePointDataType } from '../../types'
+import { marginInPX, BarChartDataType, LinePointDataType, BarCategoryDataType } from '../../types'
 import { getClientRectWidthAndHeight } from '../utils'
+import { flatMap } from '../../utils'
 
 function drawBottomXAxis(instance: BarCharts): void {
   const { svgHeight, d3ishSVG, xScaleBand, margin, isFirstDraw } = instance
@@ -106,12 +107,13 @@ export class BarCharts {
   >
   theNewEnterBarsRects: Selection<
     SVGRectElement,
-    BarChartDataType,
+    BarCategoryDataType,
     SVGGElement,
     BarChartDataType
   >
   isFirstDraw: boolean = true
   onRectClick: (data: BarChartDataType) => void
+  categoryLength: number
 
 
   constructor(svgDom: HTMLOrSVGElement) {
@@ -143,17 +145,20 @@ export class BarCharts {
   _prepareAxisAndScale = () => {
     const { svgWidth: width, svgHeight: height, data, margin } = this
 
+    //  給g用的
     this.xScaleBand = scaleBand()
       .range([0, width - margin.left - margin.right])
       .padding(0.1)
       .domain(data.map(d => d.date))
-
+    
+     // 給rect用的  一個g裡可能包多個rect i.e. grouped bar chart
     this.xScaleOrdinal = scaleOrdinal<string, number>()
-      .domain(data.map(d => d.date))
+      .domain(flatMap(data, d => d.categories.map(c => c.name)))
+      .range([0, this.xScaleBand.bandwidth() / this.categoryLength])
 
     this.yScaleLinear = scaleLinear()
       .range([height - margin.top, 0])
-      .domain([0, max(data, d => d.categories[0].value)])
+      .domain([0, max(flatMap(data, d => d.categories.map(c => c.value)))])
 
     this.tColors = scaleOrdinal(schemeCategory10).range([
       '#FFF279',
@@ -179,25 +184,28 @@ export class BarCharts {
       .enter()
       .append('g')
       .attr('class', wrapRect_G_ClassNameWithoutDot)
-      .attr('transform', d => {
+      .attr('transform', (d: BarChartDataType) => {
         const result = this.xScaleBand(d.date)
         return `translate( ${result + this.margin.left}, 0)`
       })
   }
 
-  setOnRectClick(onClickFromUser: (data: BarChartDataType)=> void) {
+  setOnRectClick(onClickFromUser: (data: BarChartDataType) => void) {
     this.onRectClick = onClickFromUser
   }
 
 
   drawRectInTheGs = () => {
     this.theNewEnterBarsRects = this.newEnterGsThatWrapTheRects
+      .selectAll('rect')
+      .data(d => d.categories)
+      .enter()
       .append('rect')
-      .attr('width', this.xScaleBand.bandwidth())
-      .attr('x', d => this.xScaleOrdinal(d.date))
+      .attr('class', 'dRect')
+      .attr('width', this.xScaleBand.bandwidth() / this.categoryLength)
+      .attr('x', d => this.xScaleOrdinal(d.name))
       .attr('y', this.svgHeight - this.margin.top)
-      .style('fill', (d: BarChartDataType) =>
-        this.tColors(d.categories[0].name)
+      .style('fill', d => this.tColors(d.name)
       )
   }
 
@@ -206,10 +214,10 @@ export class BarCharts {
       .transition()
       .duration(1000)
       //由下往上長
-      .attr('y', d => this.yScaleLinear(d.categories[0].value))
+      .attr('y', d  => this.yScaleLinear(d.value))
       .attr(
         'height',
-        d => this.svgHeight - this.margin.top - this.yScaleLinear(d.categories[0].value)
+        d => this.svgHeight - this.margin.top - this.yScaleLinear(d.value)
       )
   }
 
@@ -223,18 +231,20 @@ export class BarCharts {
 
     // update not enter rect
     this.dataBinds
-    .select('rect').attr('width', this.xScaleBand.bandwidth())
-    .attr('x', d => this.xScaleOrdinal(d.date))
+    .selectAll('rect')
+    .data(d => d.categories)
+    .attr('width', this.xScaleBand.bandwidth() / this.categoryLength)
+    .attr('x', (d: BarCategoryDataType)  => this.xScaleOrdinal(d.name))
     .attr('y', this.svgHeight - this.margin.top)
-    .style('fill', (d: BarChartDataType) =>
-      this.tColors(d.categories[0].name)
+    .style('fill', (d: BarCategoryDataType) =>
+      this.tColors(d.name)
     ) .transition()
     .duration(1000)
     //由下往上長
-    .attr('y', d => this.yScaleLinear(d.categories[0].value))
+    .attr('y', (d: BarCategoryDataType) => this.yScaleLinear(d.value))
     .attr(
       'height',
-      d => this.svgHeight - this.margin.top -  this.yScaleLinear(d.categories[0].value)
+      (d: BarCategoryDataType) => this.svgHeight - this.margin.top -  this.yScaleLinear(d.value)
     )
   }
 
@@ -256,6 +266,7 @@ export class BarCharts {
   draw = (data: BarChartDataType[]) => {
 
     this.data = data
+    this.categoryLength = data[0].categories.length
     const { svgWidth, svgHeight, margin, d3ishSVG } = this
 
     d3ishSVG

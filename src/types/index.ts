@@ -16,6 +16,7 @@ export interface LineDataType {
 }
 
 export interface BarCategoryDataType {
+  date: string,
   name: string,
   value: number,
 }
