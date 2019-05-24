@@ -70,6 +70,18 @@ const wrapRect_G_ClassNameWithoutDot = wrapRect_G_ClassName.substring(
   wrapRect_G_ClassName.length
 )
 
+const  addClickCBOnNewEnterG = (newEnterGsThatWrapTheRects: Selection<
+  SVGGElement,
+  BarChartDataType,
+  SVGGElement,
+  BarChartDataType
+>, cb: (data: BarChartDataType) => void) => {
+
+  if (cb) {
+    newEnterGsThatWrapTheRects.on('click', cb)
+  }
+}
+
 export class BarCharts {
   svgDom: HTMLOrSVGElement
   d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
@@ -86,19 +98,20 @@ export class BarCharts {
 
   tColors: ScaleOrdinal<string, string>
   dataBinds: Selection<BaseType, BarChartDataType, SVGGElement, any>
-  theGsThatWrapTheRects: Selection<
+  newEnterGsThatWrapTheRects: Selection<
     SVGGElement,
     BarChartDataType,
     SVGGElement,
     BarChartDataType
   >
-  theBarsRects: Selection<
+  theNewEnterBarsRects: Selection<
     SVGRectElement,
     BarChartDataType,
     SVGGElement,
     BarChartDataType
   >
   isFirstDraw: boolean = true
+  onRectClick: (data: BarChartDataType) => void
 
 
   constructor(svgDom: HTMLOrSVGElement) {
@@ -135,15 +148,12 @@ export class BarCharts {
       .padding(0.1)
       .domain(data.map(d => d.date))
 
-   
     this.xScaleOrdinal = scaleOrdinal<string, number>()
       .domain(data.map(d => d.date))
 
     this.yScaleLinear = scaleLinear()
       .range([height - margin.top, 0])
       .domain([0, max(data, d => d.categories[0].value)])
-
-  
 
     this.tColors = scaleOrdinal(schemeCategory10).range([
       '#FFF279',
@@ -152,12 +162,10 @@ export class BarCharts {
       '#6b486b',
       '#a05d56',
       '#d0743c',
-      '#ff8c00'
+      '#ff8c00',
     ])
 
   }
-
-  
 
   bindDataToG() {
     this.dataBinds = this.d3ishSVG
@@ -167,7 +175,7 @@ export class BarCharts {
 
   enter_drawNewGsThatToWrapTheRect() {
     // 包住 rect的 g
-    this.theGsThatWrapTheRects = this.dataBinds
+    this.newEnterGsThatWrapTheRects = this.dataBinds
       .enter()
       .append('g')
       .attr('class', wrapRect_G_ClassNameWithoutDot)
@@ -177,19 +185,24 @@ export class BarCharts {
       })
   }
 
+  setOnRectClick(onClickFromUser: (data: BarChartDataType)=> void) {
+    this.onRectClick = onClickFromUser
+  }
+
+
   drawRectInTheGs = () => {
-    this.theBarsRects = this.theGsThatWrapTheRects
+    this.theNewEnterBarsRects = this.newEnterGsThatWrapTheRects
       .append('rect')
       .attr('width', this.xScaleBand.bandwidth())
       .attr('x', d => this.xScaleOrdinal(d.date))
-      .attr('y', this.svgHeight)
+      .attr('y', this.svgHeight - this.margin.top)
       .style('fill', (d: BarChartDataType) =>
         this.tColors(d.categories[0].name)
       )
   }
 
   setRectTransition = () => {
-    this.theBarsRects
+    this.theNewEnterBarsRects
       .transition()
       .duration(1000)
       //由下往上長
@@ -205,14 +218,14 @@ export class BarCharts {
     // 移動g
     this.dataBinds.attr('transform', d => {
       const result = this.xScaleBand(d.date)
-      return `translate( ${result + this.margin.left}, 0)`
+      return `translate( ${result + this.margin.left}, 0 )`
     })
 
     // update not enter rect
     this.dataBinds
     .select('rect').attr('width', this.xScaleBand.bandwidth())
     .attr('x', d => this.xScaleOrdinal(d.date))
-    .attr('y', this.svgHeight)
+    .attr('y', this.svgHeight - this.margin.top)
     .style('fill', (d: BarChartDataType) =>
       this.tColors(d.categories[0].name)
     ) .transition()
@@ -226,19 +239,22 @@ export class BarCharts {
   }
 
   exit_removeNoDataCorrespondedBar = () => {
-    this.dataBinds
-    .exit()
+    const existingG =  this.dataBinds
+      .exit()
     // .transition()
     // .duration(1000)
     // .attr(
     //   'height',
     //   0,
     // )
-    .remove()
+
+    existingG.on('click', null)
+
+    existingG.remove()
   }
 
   draw = (data: BarChartDataType[]) => {
-   
+
     this.data = data
     const { svgWidth, svgHeight, margin, d3ishSVG } = this
 
@@ -248,7 +264,6 @@ export class BarCharts {
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
     this._prepareAxisAndScale()
-    
 
     drawBottomXAxis(this)
     drawLeftYAxis(this)
@@ -266,5 +281,11 @@ export class BarCharts {
 
     this.update_updateExistedBar()
 
+    addClickCBOnNewEnterG(this.newEnterGsThatWrapTheRects, this.onRectClick)
+
+  }
+
+  onSVGDestroy = () => {
+    this.d3ishSVG.selectAll('g').on('click', null)
   }
 }
