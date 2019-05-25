@@ -86,7 +86,7 @@ const barTestData2: BarcharData[] = [
   {
     date: '10705',
     categories: [
-      { date: '10705', name: '土地+建物的案件量', value: 200 },
+      { date: '10705', name: '土地+建物的案件量', value: 100 },
       { date: '10705', name: '建物的案件量', value: 20 }
     ],
     LineCategory: [
@@ -98,8 +98,8 @@ const barTestData2: BarcharData[] = [
   {
     date: '10706',
     categories: [
-      { date: '10706', name: '土地+建物的案件量', value: 300 },
-      { date: '10706', name: '建物的案件量', value: 20 }
+      { date: '10706', name: '土地+建物的案件量', value: 250 },
+      { date: '10706', name: '建物的案件量', value: 40 }
     ],
     LineCategory: [
       { name: '土地均價', value: 20.71 },
@@ -169,7 +169,21 @@ const barTestData3: BarcharData[] = [
       { name: '透天厝均價', value: 63.29 },
       { name: '區分建物均價', value: 32.8 }
     ]
+  },
+
+  {
+    date: '10708',
+    categories: [
+      { date: '10708', name: '土地+建物的案件量', value: 400 },
+      { date: '10708', name: '建物的案件量', value: 50 }
+    ],
+    LineCategory: [
+      { name: '土地均價', value: 47.71 },
+      { name: '透天厝均價', value: 63.29 },
+      { name: '區分建物均價', value: 32.8 }
+    ]
   }
+
 ]
 
 const transToLineData = (tdata: BarcharData[]) => {
@@ -238,9 +252,13 @@ const barChart2 = new fD3Module.BarChart(svgDom3)
 barChart2.initD3ishSVG()
 barChart2.draw(testData)
 
+const svgDom4 = document.getElementById('svg4')
+const lineChart2 = new fD3Module.LineChart(svgDom4)
+lineChart2.draw(linesData)
+
 setTimeout(() => {
   barChart1.draw(barTestData2)
-
+  barChart2.draw(barTestData2)
   const linesData2 = transToLineData(barTestData2)
   lineChart1.draw(linesData2.slice(0, 2))
   pieChart1.draw(testPieChartData.slice(0, 2))
@@ -248,6 +266,7 @@ setTimeout(() => {
 
 setTimeout(() => {
   barChart1.draw(barTestData3)
+  barChart2.draw(barTestData3.slice(0,2))
   const linesData3 = transToLineData(barTestData3)
   lineChart1.draw(linesData3)
   pieChart1.draw(testPieChartData)
