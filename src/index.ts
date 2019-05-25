@@ -29,7 +29,7 @@ const testData: BarcharData[] = [
     categories: [
       { date: '10705', name: '土地+建物的案件量', value: 40 },
       { date: '10705', name: '建物的案件量', value: 20 },
-     
+      { date: '10705', name: 'PP的案件量', value: 20 },
     ],
     LineCategory: [
       { name: '土地均價', value: 77.71 },
@@ -42,6 +42,7 @@ const testData: BarcharData[] = [
     categories: [
       { date: '10706', name: '土地+建物的案件量', value: 20 },
       { date: '10706', name: '建物的案件量', value: 20 },
+      { date: '10706', name: 'PP的案件量', value: 20 },
      
     ],
     LineCategory: [
@@ -56,6 +57,7 @@ const testData: BarcharData[] = [
     categories: [
       { date: '10707', name: '土地+建物的案件量', value: 80 },
       { date: '10707', name: '建物的案件量', value: 50 },
+      { date: '10707', name: 'PP的案件量', value: 90 },
      
     ],
     LineCategory: [
@@ -69,6 +71,7 @@ const testData: BarcharData[] = [
     categories: [
       { date: '10708', name: '土地+建物的案件量', value: 120 },
       { date: '10708', name: '建物的案件量', value: 20 },
+      { date: '10708', name: 'PP的案件量', value: 20 },
      
     ],
     LineCategory: [
@@ -209,7 +212,7 @@ const transToLineData = (tdata: BarcharData[]) => {
 const svgDom1 = document.getElementById('svg1')
 const barChart1 = new fD3Module.BarChart(svgDom1)
 barChart1.initD3ishSVG()
-barChart1.setOnRectClick(d => pieChart1.draw(barTestData3[0].LineCategory))
+barChart1.setOnRectClick(d => console.log(d))
 barChart1.draw(testData)
 
 const linesData = transToLineData(testData)
