@@ -83,7 +83,7 @@ export class BarCharts {
   svgDom: HTMLOrSVGElement
   d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
   data: BarChartDataType[]
-  margin: marginInPX = { top: 40, right: 40, bottom: 40, left: 40 }
+  margin: marginInPX = { top: 20, right: 40, bottom: 40, left: 40 }
   svgWidth: number
   svgHeight: number
 
@@ -166,7 +166,7 @@ export class BarCharts {
       .domain(forXScaleDomain)
 
     this.yScaleLinear = scaleLinear()
-      .range([height - margin.top, 0])
+      .range([height - margin.bottom, margin.top])
       .domain([0, max(flatMap(data, d => d.categories.map(c => c.value)))])
 
     this.tColors = scaleOrdinal(schemeCategory10).range([
@@ -212,7 +212,7 @@ export class BarCharts {
       .append('rect')
       .attr('width', this.xScaleBandG.bandwidth() / this.categoryLength)
       .attr('x', d => this.xScaleBandRect(d.name))
-      .attr('y', this.svgHeight - this.margin.top)
+      .attr('y', this.svgHeight - this.margin.bottom)
       .style('fill', d => this.tColors(d.name)
       )
       .on('click', this.onRectClick)
@@ -226,7 +226,7 @@ export class BarCharts {
       .attr('y', d  => this.yScaleLinear(d.value))
       .attr(
         'height',
-        d => this.svgHeight - this.margin.top - this.yScaleLinear(d.value)
+        d => this.svgHeight - this.margin.bottom - this.yScaleLinear(d.value)
       )
   }
 
@@ -252,7 +252,7 @@ export class BarCharts {
     .attr('y', d => this.yScaleLinear(d.value))
     .attr(
       'height',
-      d => this.svgHeight - this.margin.top -  this.yScaleLinear(d.value)
+      d => this.svgHeight - this.margin.bottom -  this.yScaleLinear(d.value)
     )
   }
 
@@ -262,7 +262,7 @@ export class BarCharts {
 
     existingRect.transition()
      .duration(1200)
-     .attr('y', this.svgHeight- this.margin.top)
+     .attr('y', this.svgHeight - this.margin.bottom)
      .attr(
        'height',
        0,

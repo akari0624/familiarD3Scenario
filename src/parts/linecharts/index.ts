@@ -23,6 +23,7 @@ import { LinePointDataType, LineDataType, marginInPX } from '../../types'
 import {flatMap} from '../../utils'
 import { getClientRectWidthAndHeight } from '../utils'
 
+
 function drawRightYAxis(instance: LineCharts): void {
   const { svgWidth, d3ishSVG, yMaxScaleLinear, isFirstDraw, margin } = instance
   if (isFirstDraw) {
@@ -51,12 +52,12 @@ function drawRightYAxis(instance: LineCharts): void {
 const lineFunc = (instance: LineCharts) => (line<LinePointDataType>()
       .x((d: LinePointDataType) => {
         const x1 = instance.xScaleBand(d.date) + instance.xScaleBand.bandwidth() / 2 + (instance.margin.left + instance.margin.right) /2
-        console.log('x1', x1)
+      //  console.log('x1', x1)
         return x1
       })
       .y((d: LinePointDataType) => {
         const y1 = instance.yMaxScaleLinear(d.value)
-        console.log('y1', y1)
+      //  console.log('y1', y1)
         return y1
       })
 )
@@ -91,7 +92,7 @@ export class LineCharts {
         valueOf(): number
       }
   >
-  margin: marginInPX = { top: 40, right: 40, bottom: 40, left: 40 }
+  margin: marginInPX = { top: 20, right: 40, bottom: 40, left: 40 }
   lineFunc: Line<[LinePointDataType, LinePointDataType]>
   lineColors: ScaleOrdinal<string, string>
   dataBinds: Selection<BaseType, LineDataType, SVGGElement, LinePointDataType[]>
@@ -130,7 +131,7 @@ export class LineCharts {
       .domain(flatMap(data, (d: LineDataType) => d.datas.map(dd => dd.date)))
 
     this.yMaxScaleLinear = scaleLinear()
-      .range([height - margin.bottom, 0])
+      .range([height - margin.bottom, margin.top])
       .domain([0, max(flatMap(data, d => d.datas.map(dd => dd.value)), d => d)])
 
     this.yRightAxis = axisRight(this.yMaxScaleLinear)
