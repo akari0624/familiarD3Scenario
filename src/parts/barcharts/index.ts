@@ -242,13 +242,12 @@ export class BarCharts {
     this.dataBinds
     .selectAll('rect')
     .data(d => d.categories)
-    .attr('width', (this.xScaleBandG.bandwidth() / this.categoryLength))
-    .attr('x', d  => this.xScaleBandRect(d.name))
-    .attr('y', this.svgHeight - this.margin.top)
     .style('fill', d =>
       this.tColors(d.name)
     ) .transition()
     .duration(1000)
+    .attr('width', (this.xScaleBandG.bandwidth() / this.categoryLength))
+    .attr('x', d  => this.xScaleBandRect(d.name))
     //由下往上長
     .attr('y', d => this.yScaleLinear(d.value))
     .attr(
