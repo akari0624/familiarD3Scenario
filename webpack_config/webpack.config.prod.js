@@ -2,8 +2,9 @@
 
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+// const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const WEBPACK_Config_Base = require('./webpack.config.base');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 
 let __LOADERS_ARR;
@@ -55,21 +56,43 @@ module.exports = {
       }
     ]
   },
-  plugins: [new HtmlWebPackPlugin({
-    template: path.join(__dirname, '../', 'index.html'),
-    filename: './index.html'
-  })],
+  plugins: [
+    new HtmlWebPackPlugin({
+      template: path.join(__dirname, '../', 'index.html'),
+      filename: './index.html'
+    }),
+    new BundleAnalyzerPlugin(
+      {
+        analyzerMode: 'server',
+        analyzerHost: '127.0.0.1',
+        analyzerPort: 8889,
+        reportFilename: 'report.html',
+        defaultSizes: 'parsed',
+        openAnalyzer: true,
+        generateStatsFile: false,
+        statsFilename: 'stats.json',
+        statsOptions: null,
+        logLevel: 'info'
+      }
+    )
+  ],
   resolve: WEBPACK_Config_Base.RESOLVE_SETTING_CONFIG,
   optimization: {
     splitChunks: {
       chunks: 'all'
     },
-    minimizer: [new UglifyJSPlugin({
-      uglifyOptions: {
-        compress: {
-          drop_console: true
-        }
-      }
-    })]
+    /*
+      不知為何讓UglifyJSPlugin再跑一次 drop掉console.log 的時候會有這個錯：
+      ERROR in vendors~main.67d16887d279196e2599.js from UglifyJs
+Unexpected token: name «count», expected: punc «;» [vendors~main.67d16887d279196e2599.js:1258,6]
+ 一時找不出原因，只好先不使用
+    */
+    // minimizer: [new UglifyJSPlugin({
+    //   uglifyOptions: {
+    //     compress: {
+    //       drop_console: true
+    //     }
+    //   }
+    // })]
   }
 }
