@@ -42,7 +42,9 @@
         "beforeEach":false,
         "global":false,
         "require": false,
-        "process": false
+        "process": false,
+        "__dirname": false,
+        "module": false
 
 
     }
