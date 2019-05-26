@@ -510,7 +510,7 @@ var toolTipDiv = d3
 // lineData[1]是建物均價折線上的一個個點
 lineData.forEach(function(one, i1) {
   svg
-    .selectAll('dots')
+    .selectAll('.dots')
     .data(one)
     .enter()
     .append('circle')
