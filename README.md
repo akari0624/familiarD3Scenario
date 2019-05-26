@@ -81,5 +81,5 @@ npm run ${script}WithBabel
   - ~~折線圖~~
   - ~~圓餅圖~~
   - 事件綁定
-  - exit, update
+  - ~~exit, update~~
   - legend區
