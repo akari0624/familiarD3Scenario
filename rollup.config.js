@@ -8,7 +8,7 @@ import babel from 'rollup-plugin-babel';
 
 const isWatch = process.env.ROLLUP_WATCH;
 const production = !isWatch
-console.log('is watching?', isWatch)   // rollup -c -w, -w is watch, if watch, means we are in dev mode
+console.log('is watching?', isWatch ? isWatch: false)   // rollup -c -w, -w is watch, if watch, means we are in dev mode
 console.log('is production?', production)
 
 const BUNDLE_DIR_NAME = 'dist'
@@ -38,9 +38,22 @@ export default {
       // https://github.com/ezolenko/rollup-plugin-typescript2/issues/105
       clean: true
     }),
+    // 不使用專案底下的.babelrc 設定，因為corejs 3出了以後，@babel/polyfll 被deprecated了，改在這邊寫適合rollup的polyfill，並且是使用coreJS 3的
     babel({
-      exclude: 'node_modules/**'
+      babelrc: false,
+      exclude: 'node_modules/**',
+      presets: [
+        '@babel/preset-env',
+        '@babel/transform-runtime', 
+        { 
+          useBuiltIns: 'entry',
+          corejs: 3,
+          modules: false 
+        }
+      ],
     }),
+    // dev的時候 生出html 以讓rollup devServer去載入 以方便`肉眼 手動`測試...
+    // 因為有html, output那邊就不會只是一個file
     isWatch && htmlTemplate({
       template: './index.html',
       target: `./${BUNDLE_DIR_NAME}/index.html`,
