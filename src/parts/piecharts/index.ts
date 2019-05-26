@@ -1,4 +1,7 @@
-import { select as D3Select, Selection, schemeCategory10, scaleOrdinal, arc, Arc, DefaultArcObject, pie, Pie, BaseType, PieArcDatum, interpolate as D3Interpolate } from 'd3'
+import { select as D3Select, Selection, BaseType } from 'd3-selection'
+import { scaleOrdinal } from 'd3-scale'
+import {arc, Arc, pie, Pie,  PieArcDatum } from 'd3-shape'
+import { interpolate as D3Interpolate } from 'd3-interpolate'
 import { ArcInPieDataType } from '../../types'
 import { getClientRectWidthAndHeight } from '../utils'
 
@@ -8,7 +11,7 @@ import { getClientRectWidthAndHeight } from '../utils'
 const threeColorForPirChart = scaleOrdinal<string>().range(['#ff7f50', '#7f55d4', '#6fbfad'])
 
 const getArcTween = (
-  arc_layout: Arc<any, PieArcDatum<number>>,
+  arc_layout: Arc<any, PieArcDatum<ArcInPieDataType>>,
   _current: number,
 ) => (b: any) => {
   let i = D3Interpolate(_current, b)
@@ -27,11 +30,11 @@ export class PieCharts {
   svgHeight: number
   pieRadius: number
   pieInnerRadius: number = 0
-  arcFunc: Arc<any, PieArcDatum<number>>
+  arcFunc: Arc<BaseType, PieArcDatum<ArcInPieDataType>>
   pieLayout: Pie<any, ArcInPieDataType>
-  theWholeWrapperG: Selection<SVGGElement, any, HTMLElement, any>
-  dataBinds: Selection<BaseType, {}, SVGGElement, any>
-  newEnterGs: Selection<SVGGElement, {}, SVGGElement, any>
+  theWholeWrapperG: Selection<BaseType, any, HTMLElement, any>
+  dataBinds: Selection<BaseType, PieArcDatum<ArcInPieDataType>, BaseType, any>
+  newEnterGs: Selection<BaseType, PieArcDatum<ArcInPieDataType>, BaseType, any>
   arcTweenFunc: (b: any) => (t: any) => string
   isFirstBind: boolean = true
 
@@ -60,7 +63,7 @@ export class PieCharts {
 
   initNeededFunc() {
 
-    this.arcFunc = arc<PieArcDatum<number>>()
+    this.arcFunc = arc<PieArcDatum<ArcInPieDataType>>()
     .innerRadius(this.pieInnerRadius)
     .outerRadius(this.pieRadius - 40);
 

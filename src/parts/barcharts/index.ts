@@ -1,28 +1,22 @@
+import { select as D3Select, Selection, BaseType } from 'd3-selection'
 import {
-  select as D3Select,
-  Selection,
   scaleBand,
   ScaleBand,
   scaleOrdinal,
   ScaleOrdinal,
-  max,
-  schemeCategory10,
-  line,
-  Line,
   scaleLinear,
   ScaleLinear,
-  scaleTime,
-  timeParse,
-  timeFormat,
-  axisRight,
-  Axis,
-  axisBottom,
-  axisLeft,
-  mouse,
-  BaseType,
-  timeout,
-} from 'd3'
-import { marginInPX, BarChartDataType, LinePointDataType, BarCategoryDataType } from '../../types'
+} from 'd3-scale'
+import { max } from 'd3-array'
+import { axisBottom, axisLeft } from 'd3-axis'
+import { timeout } from 'd3-timer'
+import { transition as d3Transition } from 'd3-transition';
+D3Select.prototype.transition = d3Transition;
+import {
+  marginInPX,
+  BarChartDataType,
+  BarCategoryDataType,
+} from '../../types'
 import { getClientRectWidthAndHeight } from '../utils'
 import { flatMap } from '../../utils'
 
@@ -33,13 +27,19 @@ function drawBottomXAxis(instance: BarCharts): void {
     d3ishSVG
       .append('g')
       .attr('class', 'x_axis')
-      .attr('transform', `translate(${margin.left}, ${svgHeight - margin.bottom})`)
+      .attr(
+        'transform',
+        `translate(${margin.left}, ${svgHeight - margin.bottom})`
+      )
       .call(axisBottom(xScaleBandG))
-  }else {
+  } else {
     d3ishSVG
-    .select('.x_axis')
-    .attr('transform', `translate(${margin.left}, ${svgHeight - margin.bottom})`)
-    .call(axisBottom(xScaleBandG))
+      .select('.x_axis')
+      .attr(
+        'transform',
+        `translate(${margin.left}, ${svgHeight - margin.bottom})`
+      )
+      .call(axisBottom(xScaleBandG))
   }
 }
 
@@ -59,12 +59,10 @@ function drawLeftYAxis(instance: BarCharts): void {
       .attr('dy', '.71em')
       .style('text-anchor', 'end')
       .text('案件數')
-  }else {
+  } else {
     d3ishSVG.select('.y_axis_left').call(axisLeft(yScaleLinear).ticks(5))
   }
 }
-
-
 
 const wrapRect_G_ClassName = '.state'
 const wrapRect_G_ClassNameWithoutDot = wrapRect_G_ClassName.substring(
@@ -72,8 +70,10 @@ const wrapRect_G_ClassNameWithoutDot = wrapRect_G_ClassName.substring(
   wrapRect_G_ClassName.length
 )
 
-const  addClickCBOnNewEnterG = (newEnterGsThatWrapTheRects: Selection<SVGRectElement, BarCategoryDataType, SVGGElement, BarChartDataType>, cb: (data: BarCategoryDataType) => void) => {
-
+const addClickCBOnNewEnterG = (
+  newEnterGsThatWrapTheRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>,
+  cb: (data: BarCategoryDataType) => void
+) => {
   if (cb) {
     newEnterGsThatWrapTheRects.on('click', cb)
   }
@@ -95,22 +95,11 @@ export class BarCharts {
 
   tColors: ScaleOrdinal<string, string>
   dataBinds: Selection<BaseType, BarChartDataType, SVGGElement, any>
-  newEnterGsThatWrapTheRects: Selection<
-    SVGGElement,
-    BarChartDataType,
-    SVGGElement,
-    BarChartDataType
-  >
-  theNewEnterBarsRects: Selection<
-    SVGRectElement,
-    BarCategoryDataType,
-    SVGGElement,
-    BarChartDataType
-  >
+  newEnterGsThatWrapTheRects: Selection<BaseType, BarChartDataType, SVGGElement, any>
+  theNewEnterBarsRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>
   isFirstDraw: boolean = true
   onRectClick: (data: BarCategoryDataType) => void
   categoryLength: number
-
 
   constructor(svgDom: HTMLOrSVGElement) {
     this.svgDom = svgDom
@@ -126,9 +115,9 @@ export class BarCharts {
     }
 
     this.d3ishSVG
-    .attr('width', this.svgWidth)
-    .attr('height', this.svgHeight)
-    .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
+      .attr('width', this.svgWidth)
+      .attr('height', this.svgHeight)
+      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
   }
 
   getTheD3ishSVG() {
@@ -148,28 +137,28 @@ export class BarCharts {
 
     //  給g用的
     this.xScaleBandG = scaleBand()
-    // range 參數array的第二個數  是要給入  所有g最後會用到多少空間，而不是一個g會用到多少空間
-    // d3會自己這次進來的資料應該有多少個g, 然後d3會去除出各個g應該分配多少寬度
+      // range 參數array的第二個數  是要給入  所有g最後會用到多少空間，而不是一個g會用到多少空間
+      // d3會自己這次進來的資料應該有多少個g, 然後d3會去除出各個g應該分配多少寬度
       .range([0, width - margin.left - margin.right])
       .padding(0.1)
       .domain(data.map(d => d.date))
 
-     // 給rect用的  一個g裡可能包多個rect i.e. grouped bar chart
+    // 給rect用的  一個g裡可能包多個rect i.e. grouped bar chart
     const oneData = data.slice(0, 1)
-    const forXScaleDomain  = flatMap(oneData, d => d.categories.map(c => c.name))
+    const forXScaleDomain = flatMap(oneData, d => d.categories.map(c => c.name))
     this.xScaleBandRect = scaleBand<string>()
-    // 同理 這裡range 參數array的第二個數  是要給入  所有rect最後會用到多少空間，而不是一個rect會用到多少空間
-    // d3會自己這次進來的資料應該有多少個rect, 然後d3會去除出各個g應該分配多少寬度
-    // 所以這個array裡的第二個參數等於是這一次一塊g的寬度
+      // 同理 這裡range 參數array的第二個數  是要給入  所有rect最後會用到多少空間，而不是一個rect會用到多少空間
+      // d3會自己這次進來的資料應該有多少個rect, 然後d3會去除出各個g應該分配多少寬度
+      // 所以這個array裡的第二個參數等於是這一次一塊g的寬度
       .range([0, this.xScaleBandG.bandwidth()])
-    // 給入這次有的category name
+      // 給入這次有的category name
       .domain(forXScaleDomain)
 
     this.yScaleLinear = scaleLinear()
       .range([height - margin.bottom, margin.top])
       .domain([0, max(flatMap(data, d => d.categories.map(c => c.value)))])
 
-    this.tColors = scaleOrdinal(schemeCategory10).range([
+    this.tColors = scaleOrdinal<string>().range([
       '#FFF279',
       '#FFFF00',
       '#7b6888',
@@ -178,7 +167,6 @@ export class BarCharts {
       '#d0743c',
       '#ff8c00',
     ])
-
   }
 
   bindDataToG() {
@@ -203,7 +191,6 @@ export class BarCharts {
     this.onRectClick = onClickFromUser
   }
 
-
   drawNewEnterRectInTheGs = () => {
     this.theNewEnterBarsRects = this.newEnterGsThatWrapTheRects
       .selectAll('rect')
@@ -213,8 +200,7 @@ export class BarCharts {
       .attr('width', this.xScaleBandG.bandwidth() / this.categoryLength)
       .attr('x', d => this.xScaleBandRect(d.name))
       .attr('y', this.svgHeight - this.margin.bottom)
-      .style('fill', d => this.tColors(d.name)
-      )
+      .style('fill', d => this.tColors(d.name))
       .on('click', this.onRectClick)
   }
 
@@ -223,7 +209,7 @@ export class BarCharts {
       .transition()
       .duration(1000)
       //由下往上長
-      .attr('y', d  => this.yScaleLinear(d.value))
+      .attr('y', d => this.yScaleLinear(d.value))
       .attr(
         'height',
         d => this.svgHeight - this.margin.bottom - this.yScaleLinear(d.value)
@@ -231,7 +217,6 @@ export class BarCharts {
   }
 
   update_updateExistedBar = () => {
-
     // 移動g
     this.dataBinds.attr('transform', d => {
       const result = this.xScaleBandG(d.date)
@@ -240,45 +225,44 @@ export class BarCharts {
 
     // update not enter rect
     this.dataBinds
-    .selectAll('rect')
-    .data(d => d.categories)
-    .style('fill', d =>
-      this.tColors(d.name)
-    ) .transition()
-    .duration(1000)
-    .attr('width', (this.xScaleBandG.bandwidth() / this.categoryLength))
-    .attr('x', d  => this.xScaleBandRect(d.name))
-    //由下往上長
-    .attr('y', d => this.yScaleLinear(d.value))
-    .attr(
-      'height',
-      d => this.svgHeight - this.margin.bottom -  this.yScaleLinear(d.value)
-    )
+      .selectAll('rect')
+      .data(d => d.categories)
+      .style('fill', d => this.tColors(d.name))
+      .transition()
+      .duration(1000)
+      .attr('width', this.xScaleBandG.bandwidth() / this.categoryLength)
+      .attr('x', d => this.xScaleBandRect(d.name))
+      //由下往上長
+      .attr('y', d => this.yScaleLinear(d.value))
+      .attr(
+        'height',
+        d => this.svgHeight - this.margin.bottom - this.yScaleLinear(d.value)
+      )
   }
 
   exit_removeNoDataCorrespondedBar = () => {
     //  再給資料然後 再比對rect一次  刪掉沒有資料對應的rect
-    const existingRect =  this.dataBinds.selectAll('rect').data(d => d.categories).exit()
+    const existingRect = this.dataBinds
+      .selectAll('rect')
+      .data(d => d.categories)
+      .exit()
 
-    existingRect.transition()
-     .duration(1200)
-     .attr('y', this.svgHeight - this.margin.bottom)
-     .attr(
-       'height',
-       0,
-     )
+    existingRect
+      .transition()
+      .duration(1200)
+      .attr('y', this.svgHeight - this.margin.bottom)
+      .attr('height', 0)
 
     existingRect.on('click', null)
     timeout(() => {
       existingRect.remove()
     }, 1500)
 
-     //刪掉沒有資料對應的g
+    //刪掉沒有資料對應的g
     this.dataBinds.exit().remove()
   }
 
   draw = (data: BarChartDataType[]) => {
-
     this.data = data
     this.categoryLength = data[0].categories.length
 
@@ -301,7 +285,6 @@ export class BarCharts {
     this.update_updateExistedBar()
 
     addClickCBOnNewEnterG(this.theNewEnterBarsRects, this.onRectClick)
-
   }
 
   onSVGDestroy = () => {

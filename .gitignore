@@ -10,3 +10,6 @@ npm-debug.log
 
 now.json
 
+# rollup bundle visual analyzer report 
+stats.html
+
