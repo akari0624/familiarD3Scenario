@@ -112,7 +112,7 @@ export class PieCharts {
 
   doUpdate() {
     this.theWholeWrapperG
-    .selectAll('.arc')
+    .selectAll('.arc')   // the g
     .select('path')
     .attr('d', this.arcFunc)
       .attr('fill', (d, i: number) => {
@@ -132,7 +132,9 @@ export class PieCharts {
     this.initD3ishSVG()
     this.initNeededFunc()
     this.appendOutWrapperGAndSetTheStartDrawCenter()
+
     this.startToBindBeforeEnter()
+
     this.doEnter()
     this.doExitRemove()
     this.doUpdate()
