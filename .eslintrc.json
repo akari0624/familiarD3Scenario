@@ -40,7 +40,9 @@
     "globals": {
         "describe":false,
         "beforeEach":false,
-        "global":false
+        "global":false,
+        "require": false,
+        "process": false
 
 
     }
