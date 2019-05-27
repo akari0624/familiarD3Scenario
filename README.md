@@ -1,85 +1,61 @@
-# react+redux boilerplate simple starter with TypeScript environment
+# 似曾相識的D3應用場景 - familiarD3Scenario
 
-## easy and simple react starter without server side rendering
-
-### how to use
+### 使用
+- 在`html`上以`<script>`載入本library
+``` html
+  <script type="text-javascript" src="https://familiard3scenaio.morris0987.now.sh/dist/familiard3scenario0.5.1.js" charset="utf-8"></script>
 ```
-git clone...  
+載入完後在`window`底下就會有一`familiarD3Scenario`的函式可使用，
+``` javascript
+ var fd3Module = familiarD3Scenario()
+
+ var svgDom1 = document.getElementById('svg1')
+ var barChart1 = new fD3Module.BarChart(svgDom1)
+barChart1.initD3ishSVG()
+barChart1.setOnRectClick( function(d){console.log(d)})
+barChart1.draw(testData)
+```
+
+[詳細使用範例請先暫看](test/integration_test/index.ts)
+
+
+### 參與開發
+
+  - 安裝開發環境所需依賴
+``` shell
+git clone $this_repo_url  
 cd ...  
 npm install    # install all the 3rd-Party dependencies
 ```
+  - 寫typescript
 
-### when compile...
-  - this boilerplate use webpack [ts-loader](https://github.com/TypeStrong/ts-loader) as a bridge between TypeScript and webpack. In this way, you can write TypeScript, enjoy the benefenit from Type-Checking and your javaScript also can be bundled and you still can code in a enjoyable develop environment( thanks to amazing webpack devServer!).
-  - You may want to check more about the `faster-builds` paragraph from `ts-loader` [doc](https://github.com/TypeStrong/ts-loader#faster-builds) to see more about the more implementation detail.
+- 本repo一開始開發時使用我所熟悉的`webpack`來打包，但是有鑑於這是個要讓人使用的`library`,不是`application`， 所以後來改用`rollup`建立打包流程。因為這是我的`第一個`用`rollup`[@see](https://github.com/rollup/rollup)來打包的js repo...使用上還有許多地方須摸索，所以暫時保留`webpack`的設定與其`npm scripts`
 
-### scripts
+#### scripts
+  - dev
+``` shell
+  npm run rollup_dev
 ```
-npm run dev
+進入rollup的watch模式，啟動rollup dev server，會使用 port`10001`, 在瀏覽器上透過`localhost:10001`可以去到測試頁面  
+**但** 
+目前有解決不了的typescript設置錯誤，建議先用`webpack`的devWithBabel模式代替:
+``` shell
+  npm run devWithBabel
 ```
-  - run your frontend-app with webpack-devServer when you are in developing
 
+`localhost:9999`就能到hot reload開發頁面
 
+  - build
+``` shell
+  npm run rollup_dist
 ```
-npm run fastbuild_dev
-```
- - use this script when your app become bigger to run fastBuild develop mode, this will require [fork-ts-checker-webpack-plugin](https://github.com/Realytics/fork-ts-checker-webpack-plugin) and it will  boot another process to do Type-Checking job
- - more ref:
-   - [ts-loader doc- faster-builds](https://github.com/TypeStrong/ts-loader#faster-builds)
-   - [blog post](https://medium.com/webpack/typescript-webpack-super-pursuit-mode-83cc568dea79) about fastBuild in TypeScript + webpack dev environment by ts-loader primary maintainer - John Reilly
+打包出最後的library(含目前所有用到的d3 dependencies)，和對應的`source map`到`dist`資料夾裡
 
- 
-```
-npm run dist
-```
-  - production mode, will generate bundle.js files to ./dist/...
-
-
-```
-npm run deploy 
-```
-  - help people to deploy their work to GH-Page, but you need to create a repository on Github first and  adjust `publicPath` property first in `webpack.config.prod.js`. [good Github Page detail reference on GatsbyJS doc](https://www.gatsbyjs.org/docs/how-gatsby-works-with-github-pages/) <-this script basic work like this 
-
-
-### tsconfig.json - the config file of TypeScript
-- most important part - compilerOptions
-[see what can be set](https://www.typescriptlang.org/docs/handbook/compiler-options.html)
-
-
-###  `dev`, `fastbuild_dev`, `dist`, these three scripts have `withBabel` mode
-```
-npm run ${script}WithBabel
-```
-  - this will make webpack build the TypeScript code first time use ts-loader(it use the `tsc` i.e. TypeScript Compiler), generate the compiled JS code then forward them to babel-loader, let it do second time transpile to ensure the javascript code is you think in the `.babelrc`.
-  - `tsc` has the ability to transform TypeScript code to ES5 evne ES3,(set theme up in `tsconfig.json` [target](https://www.typescriptlang.org/docs/handbook/compiler-options.html)),
-  but what we need to realize is, `tsc` is a transpiler, it only do transpile but not doing `polyfill`,
-  [reference](https://github.com/frankwallis/plugin-typescript/issues/166#issuecomment-253413831)  
-  if you need to support old browser that their js engine don't support `ES6`, you still need to find 
-  a way to see what special function you use (e.g `Promise`, `async await`, `spread operator`...), and put on their corresponding polyfill, so even babel will make build time longer and make bundled js files bigger, it is a suitable solution if you need to support browser doesn't recognize ES6.
-  And babel has its ability that support newest javascript syntax and other features, so these scripts created for those usage scenario.
-  - @see 
-    - [typescript-and-babel-7](https://blogs.msdn.microsoft.com/typescript/2018/08/27/typescript-and-babel-7/)
-    - [ts-loader-issues-755](https://github.com/TypeStrong/ts-loader/issues/755)
-
-
-### about linting
-- `eslint` is not capable for TypeScript 
-- install `tslint` in local or global(/path/to/your/node/bin). if you run `npm install`, you will install `tslint` locally, since I put that dependency in `package.json`
-- your IDE must need to install proper lint extension to collaborate with tslint, I use `TypeScript TSLint Plugin` in vs-code
-- use your lint rule in `tslint.json` file. [doc](https://github.com/palantir/tslint)
-[tslint.json example](https://palantir.github.io/tslint/usage/configuration/)
-- check `tslint` rules [here](https://palantir.github.io/tslint/rules/)
-- if you want to run `fastbuild_dev` mode, configuration for `tslint` is essential.
-
-
-### write your code
--  react components always contain `JSX` syntax, in TypeScript environment, the extension of these files must need to be `.tsx`.
-- simple js file , their extension must need to be `.ts`.
-
-
-### 未完成
-  - ~~折線圖~~
-  - ~~圓餅圖~~
+### 待實作功能
+  - ~~bar chart~~, ~~grouped bar chart~~
+  - ~~line chart~~
+  - ~~pir chart~~
   - 事件綁定
   - ~~exit, update~~
   - legend區
+
