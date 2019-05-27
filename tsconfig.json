@@ -1,18 +1,20 @@
 {
   "compilerOptions": {
+    "declaration": true,
     "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "es6",
     "target": "es5",
     "jsx": "react",
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,  /* allow the import syntax don't need to be `import * as React from 'react'`*/
     "esModuleInterop": true,
-    "moduleResolution": "node",             /* make ts compiler include type definitions linked in package.json files*/
-    "lib": ["es2015", "dom"]  /* make ts know web-api(dom), promise(es2015)...etc */
+    "moduleResolution": "node"             /* make ts compiler include type definitions linked in package.json files*/
   },
   "include": [
     "./src"
+],
+"exclude": [
+  "node_modules"
 ]
 }

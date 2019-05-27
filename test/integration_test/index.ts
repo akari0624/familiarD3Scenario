@@ -1,10 +1,6 @@
 import { BarChartDataType } from '../../src/types'
+import familiarD3Scenario from '../../src'
 
-declare global {
-  interface Window {
-    familiarD3Scenario: () => any
-  }
-}
 
 interface lineData {
   name: string
@@ -216,7 +212,7 @@ const transToLineData = (tdata: BarcharData[]) => {
   return [landLine, wholeBuildLine, buildingLine]
 }
 
-const fD3Module = window.familiarD3Scenario()
+const fD3Module = familiarD3Scenario()
 
 const svgDom1 = document.getElementById('svg1')
 const barChart1 = new fD3Module.BarChart(svgDom1)
