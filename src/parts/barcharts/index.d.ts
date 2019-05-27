@@ -1,0 +1,36 @@
+import { Selection, BaseType } from 'd3-selection';
+import { ScaleBand, ScaleOrdinal, ScaleLinear } from 'd3-scale';
+import { marginInPX, BarChartDataType, BarCategoryDataType } from '../../types';
+export declare class BarCharts {
+    svgDom: HTMLOrSVGElement;
+    d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>;
+    data: BarChartDataType[];
+    margin: marginInPX;
+    svgWidth: number;
+    svgHeight: number;
+    xScaleBandG: ScaleBand<string>;
+    xScaleBandRect: ScaleBand<string>;
+    yScaleLinear: ScaleLinear<number, number>;
+    yMaxScaleLinear: ScaleLinear<number, number>;
+    tColors: ScaleOrdinal<string, string>;
+    dataBinds: Selection<BaseType, BarChartDataType, SVGGElement, any>;
+    newEnterGsThatWrapTheRects: Selection<BaseType, BarChartDataType, SVGGElement, any>;
+    theNewEnterBarsRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>;
+    isFirstDraw: boolean;
+    onRectClick: (data: BarCategoryDataType) => void;
+    categoryLength: number;
+    constructor(svgDom: HTMLOrSVGElement);
+    initD3ishSVG(): void;
+    getTheD3ishSVG(): Selection<SVGGElement, any, HTMLElement, any>;
+    setMargins(pMargins: marginInPX): void;
+    _prepareAxisAndScale: () => void;
+    bindDataToG(): void;
+    enter_drawNewGsThatToWrapTheRect(): void;
+    setOnRectClick(onClickFromUser: (data: BarCategoryDataType) => void): void;
+    drawNewEnterRectInTheGs: () => void;
+    setRectTransition: () => void;
+    update_updateExistedBar: () => void;
+    exit_removeNoDataCorrespondedBar: () => void;
+    draw: (data: BarChartDataType[]) => void;
+    onSVGDestroy: () => void;
+}
