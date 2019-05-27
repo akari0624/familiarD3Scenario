@@ -58,7 +58,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
-      template: path.join(__dirname, '../', 'index.html'),
+      template: path.join(__dirname, '../test/integration_test', 'index.html'),
       filename: './index.html'
     }),
     new webpack.HotModuleReplacementPlugin()

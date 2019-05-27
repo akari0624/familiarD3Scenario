@@ -18,7 +18,8 @@
     "test:watch": "npm run test -- --watch",
     "clean": "rimraf dist/*",
     "rollup_dist": "npm run clean && rollup -c",
-    "rollup_dev": "rollup -c -w"
+    "rollup_dev": "rollup -c -w",
+    "integration_test": "npm run rollup_dist && open index.html "
   },
   "author": "",
   "license": "ISC",

@@ -57,10 +57,10 @@ module.exports = {
     ]
   },
   plugins: [
-    new HtmlWebPackPlugin({
-      template: path.join(__dirname, '../', 'index.html'),
-      filename: './index.html'
-    }),
+    // new HtmlWebPackPlugin({
+    //   template: path.join(__dirname, '../', 'index.html'),
+    //   filename: './index.html'
+    // }),
     new BundleAnalyzerPlugin(
       {
         analyzerMode: 'server',
