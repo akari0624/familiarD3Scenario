@@ -2,10 +2,12 @@
 
 const path = require('path');
 
+console.log('production?', process.env.production)
+
 module.exports = {
 
   ENTRY_POINT: [
-    path.join(__dirname, '../', './src/index.ts')
+    path.join(__dirname, '../', process.env.production ? './src/index.ts' : './test/integration_test/index.ts')
   ],
 
   JS_TRANSPILE_LOADER_ARR_OPTIONS:{
