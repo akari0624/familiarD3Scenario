@@ -9,7 +9,8 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,  /* allow the import syntax don't need to be `import * as React from 'react'`*/
     "esModuleInterop": true,
-    "moduleResolution": "node"             /* make ts compiler include type definitions linked in package.json files*/
+    "moduleResolution": "node",             /* make ts compiler include type definitions linked in package.json files*/
+    "lib": ["es2015", "dom"]  /* make ts know web-api(dom), promise(es2015)...etc */
   },
   "include": [
     "./src"
