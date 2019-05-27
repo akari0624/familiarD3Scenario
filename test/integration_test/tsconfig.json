@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "noImplicitAny": false,
-    "module": "commonjs",
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "es6",
     "target": "es5",
     "jsx": "react",
     "allowJs": true,
@@ -10,6 +12,9 @@
     "moduleResolution": "node"             /* make ts compiler include type definitions linked in package.json files*/
   },
   "include": [
-    "./test"
+    "../../src/*"
+],
+"exclude": [
+  "node_modules"
 ]
 }
