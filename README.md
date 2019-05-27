@@ -1,5 +1,9 @@
 # 似曾相識的D3應用場景 - familiarD3Scenario
 
+### demo page
+ - [ghPage](https://akari0624.github.io/familiarD3Scenario/)
+
+
 ### 使用
 - 在`html`上以`<script>`載入本library
 ``` html
