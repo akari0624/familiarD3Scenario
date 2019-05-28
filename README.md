@@ -57,9 +57,17 @@ npm install    # install all the 3rd-Party dependencies
 
 ### 待實作功能
   - ~~bar chart~~, ~~grouped bar chart~~
+    - ~~能設定顏色~~
+    - ~~能設定YAxis名稱~~
   - ~~line chart~~
+    - ~~能設定顏色~~
+    - ~~能設定YAxis名稱~~
+    - ~~能設定是否在每個點上畫上一個醒目的點~~
   - ~~pir chart~~
+    - 能設定顏色
   - 事件綁定
+    - click
+    - onMouseOver - tooltip
   - ~~exit, update~~
   - legend區
 
