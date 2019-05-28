@@ -58,7 +58,7 @@ function drawLeftYAxis(instance: BarCharts): void {
       .attr('y', 6)
       .attr('dy', '.71em')
       .style('text-anchor', 'end')
-      .text('案件數')
+      .text(`${instance.leftYAxisText}`)
   } else {
     d3ishSVG.select('.y_axis_left').call(axisLeft(yScaleLinear).ticks(5))
   }
@@ -78,7 +78,9 @@ const addClickCBOnNewEnterG = (
     newEnterGsThatWrapTheRects.on('click', cb)
   }
 }
-
+ /**
+  * BarChart 柱狀圖的class
+  */
 export class BarCharts {
   svgDom: HTMLOrSVGElement
   d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
@@ -100,7 +102,21 @@ export class BarCharts {
   isFirstDraw: boolean = true
   onRectClick: (data: BarCategoryDataType) => void
   categoryLength: number
+  leftYAxisText: string = ''
+  colorRangeArr: string[] = [
+    '#FFF279',
+    '#FFFF00',
+    '#7b6888',
+    '#6b486b',
+    '#a05d56',
+    '#d0743c',
+    '#ff8c00',
+  ]
 
+  /**
+   *
+   * @param {HTMLOrSVGElement} svgDom svg的dom
+   */
   constructor(svgDom: HTMLOrSVGElement) {
     this.svgDom = svgDom
     const box = getClientRectWidthAndHeight(svgDom)
@@ -132,6 +148,21 @@ export class BarCharts {
     this.margin = pMargins
   }
 
+  /**
+   *
+   * @param {string} t - 要顯示在左XAxis上的字
+   */
+  setLeftYAxisText(t: string) {
+    this.leftYAxisText = t
+  }
+/**
+ *
+ * @param {string[]} hexColorStrArr 要使用的顏色，必須是hex16進制格式 #開頭
+ */
+  setColorRangeArr(hexColorStrArr: string[]) {
+    this.colorRangeArr = hexColorStrArr
+  }
+
   _prepareAxisAndScale = () => {
     const { svgWidth: width, svgHeight: height, data, margin } = this
 
@@ -158,15 +189,7 @@ export class BarCharts {
       .range([height - margin.bottom, margin.top])
       .domain([0, max(flatMap(data, d => d.categories.map(c => c.value)))])
 
-    this.tColors = scaleOrdinal<string>().range([
-      '#FFF279',
-      '#FFFF00',
-      '#7b6888',
-      '#6b486b',
-      '#a05d56',
-      '#d0743c',
-      '#ff8c00',
-    ])
+    this.tColors = scaleOrdinal<string>().range(this.colorRangeArr)
   }
 
   bindDataToG() {
