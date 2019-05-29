@@ -221,7 +221,10 @@ barChart1.initD3ishSVG()
 barChart1.setLeftYAxisText('案件數 要爆啦！')
 barChart1.setOnRectClick((d: any) => console.log(d))
 barChart1.setOnRectMouseOver((d, pX, pY) => {
-  tooltip.show(`${d.name}:${d.value}`, pX + 30, pY)
+  tooltip.show(`${d.name}:${d.value}`, pX + 10, pY - 30)
+})
+barChart1.setOnRectMouseOut(() => {
+  tooltip.hide()
 })
 barChart1.draw(testData)
 
