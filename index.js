@@ -693,6 +693,8 @@
 
   var filterEvents = {};
 
+  var event = null;
+
   if (typeof document !== "undefined") {
     var element$1 = document.documentElement;
     if (!("onmouseenter" in element$1)) {
@@ -712,9 +714,12 @@
 
   function contextListener(listener, index, group) {
     return function(event1) {
+      var event0 = event; // Events can be reentrant (e.g., focus).
+      event = event1;
       try {
         listener.call(this, this.__data__, index, group);
       } finally {
+        event = event0;
       }
     };
   }
@@ -4665,7 +4670,7 @@
 
     if (isFirstDraw) {
       d3ishSVG.append('g').attr('class', 'y_axis_left').attr('transform', "translate(" + margin.left + ", 0)").call(axisLeft(yScaleLinear).ticks(5)).append('text').style('fill', 'steelblue') // fill the text with the colour black
-      .attr('transform', 'rotate(-90)').attr('y', 6).attr('dy', '.71em').style('text-anchor', 'end').text('案件數');
+      .attr('transform', 'rotate(-90)').attr('y', 6).attr('dy', '.71em').style('text-anchor', 'end').text("" + instance.leftYAxisText);
     } else {
       d3ishSVG.select('.y_axis_left').call(axisLeft(yScaleLinear).ticks(5));
     }
@@ -4674,15 +4679,39 @@
   var wrapRect_G_ClassName = '.state';
   var wrapRect_G_ClassNameWithoutDot = wrapRect_G_ClassName.substring(1, wrapRect_G_ClassName.length);
 
-  var addClickCBOnNewEnterG = function addClickCBOnNewEnterG(newEnterGsThatWrapTheRects, cb) {
+  var addClickCBOnNewEnterRect = function addClickCBOnNewEnterRect(newEnterGsThatWrapTheRects, cb) {
     if (cb) {
       newEnterGsThatWrapTheRects.on('click', cb);
     }
   };
 
+  var addMouseOverOnNewEnterRect = function addMouseOverOnNewEnterRect(newEnterGsThatWrapTheRects, cb) {
+    if (cb) {
+      newEnterGsThatWrapTheRects.on('mouseover', function (d) {
+        cb(d, event.pageX, event.pageY);
+      });
+    }
+  };
+
+  var addMouseoutOnNewEnterRect = function addMouseoutOnNewEnterRect(newEnterGsThatWrapTheRects, cb) {
+    if (cb) {
+      newEnterGsThatWrapTheRects.on('mouseout', function () {
+        cb();
+      });
+    }
+  };
+  /**
+   * BarChart 柱狀圖的class
+   */
+
+
   var BarCharts =
   /** @class */
   function () {
+    /**
+     *
+     * @param {HTMLOrSVGElement} svgDom svg的dom
+     */
     function BarCharts(svgDom) {
       var _this = this;
 
@@ -4693,6 +4722,8 @@
         left: 40
       };
       this.isFirstDraw = true;
+      this.leftYAxisText = '';
+      this.colorRangeArr = ['#FFF279', '#FFFF00', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'];
 
       this._prepareAxisAndScale = function () {
         var _a = _this,
@@ -4723,7 +4754,7 @@
             return c.value;
           });
         }))]);
-        _this.tColors = ordinal().range(['#FFF279', '#FFFF00', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00']);
+        _this.tColors = ordinal().range(_this.colorRangeArr);
       };
 
       this.drawNewEnterRectInTheGs = function () {
@@ -4776,11 +4807,14 @@
 
         existingRect.transition().duration(1200).attr('y', _this.svgHeight - _this.margin.bottom).attr('height', 0);
         existingRect.on('click', null);
+        existingRect.on('mouseover', null);
+        existingRect.on('mouseout', null);
         timeout$1(function () {
-          existingRect.remove();
-        }, 1500); //刪掉沒有資料對應的g
+          //刪掉沒有資料對應的rect
+          existingRect.remove(); //刪掉沒有資料對應的g
 
-        _this.dataBinds.exit().remove();
+          _this.dataBinds.exit().remove();
+        }, 1500);
       };
 
       this.draw = function (data) {
@@ -4808,11 +4842,13 @@
 
         _this.update_updateExistedBar();
 
-        addClickCBOnNewEnterG(_this.theNewEnterBarsRects, _this.onRectClick);
+        addClickCBOnNewEnterRect(_this.theNewEnterBarsRects, _this.onRectClick);
+        addMouseOverOnNewEnterRect(_this.theNewEnterBarsRects, _this.onRectMouseOver);
+        addMouseoutOnNewEnterRect(_this.theNewEnterBarsRects, _this.onRectMouseOut);
       };
 
       this.onSVGDestroy = function () {
-        _this.d3ishSVG.selectAll('g').on('click', null);
+        _this.d3ishSVG.selectAll('g').on('click', null).on('mouseover', null).on('mouseout', null);
       };
 
       this.svgDom = svgDom;
@@ -4842,6 +4878,24 @@
     BarCharts.prototype.setMargins = function (pMargins) {
       this.margin = pMargins;
     };
+    /**
+     *
+     * @param {string} t - 要顯示在左XAxis上的字
+     */
+
+
+    BarCharts.prototype.setLeftYAxisText = function (t) {
+      this.leftYAxisText = t;
+    };
+    /**
+     *
+     * @param {string[]} hexColorStrArr 要使用的顏色，必須是hex16進制格式 #開頭
+     */
+
+
+    BarCharts.prototype.setColorRangeArr = function (hexColorStrArr) {
+      this.colorRangeArr = hexColorStrArr;
+    };
 
     BarCharts.prototype.bindDataToG = function () {
       this.dataBinds = this.d3ishSVG.selectAll(wrapRect_G_ClassName).data(this.data);
@@ -4860,6 +4914,14 @@
 
     BarCharts.prototype.setOnRectClick = function (onClickFromUser) {
       this.onRectClick = onClickFromUser;
+    };
+
+    BarCharts.prototype.setOnRectMouseOver = function (onMouseOverFromUser) {
+      this.onRectMouseOver = onMouseOverFromUser;
+    };
+
+    BarCharts.prototype.setOnRectMouseOut = function (onMouseOutFromUser) {
+      this.onRectMouseOut = onMouseOutFromUser;
     };
 
     return BarCharts;
@@ -5559,7 +5621,7 @@
 
     if (isFirstDraw) {
       d3ishSVG.append('g').attr('class', 'y_axis_right').attr('transform', "translate(" + (svgWidth - margin.right) + ",0)").call(axisRight(yMaxScaleLinear).ticks(5)).append('text').style('fill', 'steelblue') // fill the text with the colour black
-      .attr('transform', 'rotate(-90)').attr('y', -10).attr('dy', '.71em').style('text-anchor', 'end').text('均價');
+      .attr('transform', 'rotate(-90)').attr('y', -10).attr('dy', '.71em').style('text-anchor', 'end').text("" + instance.rightYAxisText);
     } else {
       d3ishSVG.select('.y_axis_right').attr('transform', "translate(" + (svgWidth - margin.right) + ",0)").call(axisRight(yMaxScaleLinear).ticks(5));
     }
@@ -5567,12 +5629,10 @@
 
   var lineFunc = function lineFunc(instance) {
     return line().x(function (d) {
-      var x1 = instance.xScaleBand(d.date) + instance.xScaleBand.bandwidth() / 2 + (instance.margin.left + instance.margin.right) / 2; //  console.log('x1', x1)
-
+      var x1 = instance.xScaleBand(d.date) + instance.xScaleBand.bandwidth() / 2 + (instance.margin.left + instance.margin.right) / 2;
       return x1;
     }).y(function (d) {
-      var y1 = instance.yMaxScaleLinear(d.value); //  console.log('y1', y1)
-
+      var y1 = instance.yMaxScaleLinear(d.value);
       return y1;
     });
   };
@@ -5602,6 +5662,10 @@
         left: 40
       };
       this.isFirstDraw = true;
+      this.rightYAxisText = '';
+      this.colorRangeArr = ['#FF33CC', '#0070C0', '#00B050', '#671919', '#0b172b'];
+      this.isDrawPoint = false;
+      this.pointRadius = 5;
 
       this.prepareLineColors = function () {
         _this.lineColors = ordinal() //     .domain(
@@ -5611,7 +5675,7 @@
         //         return d.Name;
         //     })
         //  )
-        .range(['#FF33CC', '#0070C0', '#00B050', '#671919', '#0b172b']);
+        .range(_this.colorRangeArr);
       };
 
       this.doDataBind = function () {
@@ -5662,6 +5726,33 @@
     LineCharts.prototype.setD3ishSVGFromOtherChart = function (d3ishSvgFromOtherChart) {
       this.d3ishSVG = d3ishSvgFromOtherChart;
     };
+    /**
+    *
+    * @param {string} t - 要顯示在右YAxis上的字
+    */
+
+
+    LineCharts.prototype.setRightYAxisText = function (t) {
+      this.rightYAxisText = t;
+    };
+    /**
+     *
+     * @param {string[]} hexColorStrArr 要使用的顏色，必須是hex16進制格式 #開頭
+     */
+
+
+    LineCharts.prototype.setColorRangeArr = function (hexColorStrArr) {
+      this.colorRangeArr = hexColorStrArr;
+    };
+
+    LineCharts.prototype.setIsDrawPoint = function (isDP, pointRadius) {
+      if (pointRadius === void 0) {
+        pointRadius = 5;
+      }
+
+      this.isDrawPoint = isDP;
+      this.pointRadius = pointRadius;
+    };
 
     LineCharts.prototype.prepareLineralAndAxis = function () {
       var _a = this,
@@ -5685,9 +5776,42 @@
       this.yRightAxis = axisRight(this.yMaxScaleLinear);
     };
 
+    LineCharts.prototype.removeAllPoint = function () {
+      if (!this.isDrawPoint) {
+        return;
+      }
+
+      this.d3ishSVG.selectAll('.pCircle').remove();
+    };
+
+    LineCharts.prototype.drawPoint = function () {
+      if (!this.isDrawPoint) {
+        return;
+      }
+
+      var tD3ishSVG = this.d3ishSVG;
+      var xScaleBand = this.xScaleBand;
+      var yMaxScaleLinear = this.yMaxScaleLinear;
+      var lineColors = this.lineColors;
+      var _margin = this.margin;
+      var _pointRadius = this.pointRadius;
+      tD3ishSVG.selectAll('.pathWrapperG').each(function (da, ind) {
+        D3Select(this).selectAll('circle').data(da.datas).enter().append('circle').attr('class', 'pCircle').attr('r', _pointRadius).attr('cx', function (d) {
+          return xScaleBand(d.date) + xScaleBand.bandwidth() / 2 + (_margin.left + _margin.right) / 2;
+        }).attr('cy', function (d) {
+          return yMaxScaleLinear(d.value);
+        }).attr('fill', function (d) {
+          return lineColors(da.name);
+        });
+      });
+    };
+
     LineCharts.prototype.draw = function (data) {
+      var _this = this;
+
       this.data = data;
       this.initD3ishSVG();
+      this.removeAllPoint();
       this.prepareLineralAndAxis();
       drawRightYAxis(this);
 
@@ -5700,6 +5824,9 @@
       this.drawTheLine(this.lineColors);
       this.update_line(this.lineColors);
       this.remove_line();
+      timeout$1(function () {
+        _this.drawPoint();
+      }, 2100);
     };
 
     return LineCharts;
@@ -5791,8 +5918,33 @@
     return PieCharts;
   }();
 
+  var ToolTip =
+  /** @class */
+  function () {
+    function ToolTip() {
+      this.toolTipDivRef = D3Select('body').append('div').lower().attr('class', 'bubbleToolTip').style('width', '50px').style('height', '70px').style('background-color', '#f2e029').style('color', '#022a61').style('font', '12px sans-serif').style('border-radius', '8px').style('text-align', 'center').style('position', 'absolute').style('padding', '2px').style('opacity', 0).style('transform', "translate3d(0px, 0px, 100px)").style('z-index', 2000000).style('transition-duration', '.5s'); //不是svg圖形的話 transition duration 就從css處理，不要用d3函式處理
+
+      this.lastX = 0;
+      this.lastY = 0;
+    }
+
+    ToolTip.prototype.show = function (contentToShow, newX, newY) {
+      this.toolTipDivRef.html(contentToShow).style('transform', "translate3d(" + newX + "px, " + newY + "px, 100px)");
+      this.toolTipDivRef.style('opacity', 0.9);
+      this.lastX = newX;
+      this.lastY = newY;
+    };
+
+    ToolTip.prototype.hide = function () {
+      this.toolTipDivRef.style('opacity', 0);
+    };
+
+    return ToolTip;
+  }();
+
   function familiarD3Scenario() {
     return {
+      ToolTip: ToolTip,
       BarChart: BarCharts,
       LineChart: LineCharts,
       PieChart: PieCharts
@@ -6117,14 +6269,25 @@
   var fD3Module = familiarD3Scenario();
   var svgDom1 = document.getElementById('svg1');
   var barChart1 = new fD3Module.BarChart(svgDom1);
+  var tooltip = new fD3Module.ToolTip();
   barChart1.initD3ishSVG();
+  barChart1.setLeftYAxisText('案件數 要爆啦！');
   barChart1.setOnRectClick(function (d) {
     return console.log(d);
+  });
+  barChart1.setOnRectMouseOver(function (d, pX, pY) {
+    tooltip.show(d.name + ":" + d.value, pX + 10, pY - 30);
+  });
+  barChart1.setOnRectMouseOut(function () {
+    tooltip.hide();
   });
   barChart1.draw(testData);
   var linesData = transToLineData(testData);
   var lineChart1 = new fD3Module.LineChart(svgDom1);
   lineChart1.setD3ishSVGFromOtherChart(barChart1.getTheD3ishSVG());
+  lineChart1.setColorRangeArr(['#db061b', '#665e5f', '#d8a817']);
+  lineChart1.setRightYAxisText('均價');
+  lineChart1.setIsDrawPoint(true, 3);
   lineChart1.draw(linesData);
   var svgDom2 = document.getElementById('svg2');
   var pieChart1 = new fD3Module.PieChart(svgDom2);
@@ -6143,6 +6306,8 @@
   var svgDom3 = document.getElementById('svg3');
   var barChart2 = new fD3Module.BarChart(svgDom3);
   barChart2.initD3ishSVG();
+  barChart2.setLeftYAxisText('案件數');
+  barChart2.setColorRangeArr(['#29bc69', '#102d6d', '#cd1dd3', '#9b0806']);
   barChart2.draw(testData);
   var svgDom4 = document.getElementById('svg4');
   var lineChart2 = new fD3Module.LineChart(svgDom4);
