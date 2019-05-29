@@ -216,9 +216,13 @@ const fD3Module = familiarD3Scenario()
 
 const svgDom1 = document.getElementById('svg1')
 const barChart1 = new fD3Module.BarChart(svgDom1)
+const tooltip = new fD3Module.ToolTip()
 barChart1.initD3ishSVG()
 barChart1.setLeftYAxisText('案件數 要爆啦！')
 barChart1.setOnRectClick((d: any) => console.log(d))
+barChart1.setOnRectMouseOver((d, pX, pY) => {
+  tooltip.show(`${d.name}:${d.value}`, pX + 30, pY)
+})
 barChart1.draw(testData)
 
 const linesData = transToLineData(testData)

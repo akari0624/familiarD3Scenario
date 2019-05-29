@@ -1,4 +1,4 @@
-import { select as D3Select, Selection, BaseType } from 'd3-selection'
+import { select as D3Select, Selection, BaseType, event as currentEvent} from 'd3-selection'
 import {
   scaleBand,
   ScaleBand,
@@ -78,6 +78,18 @@ const addClickCBOnNewEnterG = (
     newEnterGsThatWrapTheRects.on('click', cb)
   }
 }
+
+const addMouseOverOnNewEnterG = (
+  newEnterGsThatWrapTheRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>,
+  cb: (data: BarCategoryDataType, pageX: number, pageY: number) => void
+) => {
+
+  if(cb){
+    newEnterGsThatWrapTheRects.on('mouseover', (d) => {
+      cb(d, currentEvent.pageX, currentEvent.pageY)
+    })
+  }
+}
  /**
   * BarChart 柱狀圖的class
   */
@@ -112,6 +124,7 @@ export class BarCharts {
     '#d0743c',
     '#ff8c00',
   ]
+   onRectMouseOver: (data: BarCategoryDataType, pageX: number, pageY: number) => void
 
   /**
    *
@@ -190,6 +203,7 @@ export class BarCharts {
       .domain([0, max(flatMap(data, d => d.categories.map(c => c.value)))])
 
     this.tColors = scaleOrdinal<string>().range(this.colorRangeArr)
+    
   }
 
   bindDataToG() {
@@ -212,6 +226,10 @@ export class BarCharts {
 
   setOnRectClick(onClickFromUser: (data: BarCategoryDataType) => void) {
     this.onRectClick = onClickFromUser
+  }
+
+  setOnRectMouseOver(onMouseOverFromUser: (data: BarCategoryDataType, mouseX: number, mouseY: number) => void) {
+    this.onRectMouseOver = onMouseOverFromUser
   }
 
   drawNewEnterRectInTheGs = () => {
@@ -277,6 +295,8 @@ export class BarCharts {
       .attr('height', 0)
 
     existingRect.on('click', null)
+    existingRect.on('mouseover', null)
+    existingRect.on('mouseout', null)
     timeout(() => {
       existingRect.remove()
     }, 1500)
@@ -308,9 +328,10 @@ export class BarCharts {
     this.update_updateExistedBar()
 
     addClickCBOnNewEnterG(this.theNewEnterBarsRects, this.onRectClick)
+    addMouseOverOnNewEnterG(this.theNewEnterBarsRects, this.onRectMouseOver)
   }
 
   onSVGDestroy = () => {
-    this.d3ishSVG.selectAll('g').on('click', null)
+    this.d3ishSVG.selectAll('g').on('click', null).on('mouseover', null).on('mouseout', null)
   }
 }
