@@ -70,7 +70,7 @@ const wrapRect_G_ClassNameWithoutDot = wrapRect_G_ClassName.substring(
   wrapRect_G_ClassName.length
 )
 
-const addClickCBOnNewEnterG = (
+const addClickCBOnNewEnterRect = (
   newEnterGsThatWrapTheRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>,
   cb: (data: BarCategoryDataType) => void
 ) => {
@@ -79,7 +79,7 @@ const addClickCBOnNewEnterG = (
   }
 }
 
-const addMouseOverOnNewEnterG = (
+const addMouseOverOnNewEnterRect = (
   newEnterGsThatWrapTheRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>,
   cb: (data: BarCategoryDataType, pageX: number, pageY: number) => void
 ) => {
@@ -87,6 +87,14 @@ const addMouseOverOnNewEnterG = (
   if(cb){
     newEnterGsThatWrapTheRects.on('mouseover', (d) => {
       cb(d, currentEvent.pageX, currentEvent.pageY)
+    })
+  }
+}
+
+const addMouseoutOnNewEnterRect = (newEnterGsThatWrapTheRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>, cb: () => void) => {
+  if(cb) {
+    newEnterGsThatWrapTheRects.on('mouseout', () => {
+      cb()
     })
   }
 }
@@ -125,6 +133,7 @@ export class BarCharts {
     '#ff8c00',
   ]
    onRectMouseOver: (data: BarCategoryDataType, pageX: number, pageY: number) => void
+   onRectMouseOut: () => void
 
   /**
    *
@@ -232,6 +241,10 @@ export class BarCharts {
     this.onRectMouseOver = onMouseOverFromUser
   }
 
+  setOnRectMouseOut(onMouseOutFromUser:() => void) {
+    this.onRectMouseOut = onMouseOutFromUser
+  }
+
   drawNewEnterRectInTheGs = () => {
     this.theNewEnterBarsRects = this.newEnterGsThatWrapTheRects
       .selectAll('rect')
@@ -298,11 +311,14 @@ export class BarCharts {
     existingRect.on('mouseover', null)
     existingRect.on('mouseout', null)
     timeout(() => {
+      //刪掉沒有資料對應的rect
       existingRect.remove()
+      //刪掉沒有資料對應的g
+      this.dataBinds.exit().remove()
     }, 1500)
 
-    //刪掉沒有資料對應的g
-    this.dataBinds.exit().remove()
+    
+   
   }
 
   draw = (data: BarChartDataType[]) => {
@@ -327,8 +343,9 @@ export class BarCharts {
 
     this.update_updateExistedBar()
 
-    addClickCBOnNewEnterG(this.theNewEnterBarsRects, this.onRectClick)
-    addMouseOverOnNewEnterG(this.theNewEnterBarsRects, this.onRectMouseOver)
+    addClickCBOnNewEnterRect(this.theNewEnterBarsRects, this.onRectClick)
+    addMouseOverOnNewEnterRect(this.theNewEnterBarsRects, this.onRectMouseOver)
+    addMouseoutOnNewEnterRect(this.theNewEnterBarsRects, this.onRectMouseOut)
   }
 
   onSVGDestroy = () => {
