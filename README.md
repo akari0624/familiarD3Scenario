@@ -67,7 +67,10 @@ npm install    # install all the 3rd-Party dependencies
     - 能設定顏色
   - 事件綁定
     - click
-    - onMouseOver - tooltip
+    - onMouseOver
+    - onMouseOut
+      - barChart已完成
   - ~~exit, update~~
   - legend區
+  - ~~toolTip (搭配onMouseOver, onMouseOut)~~
 
