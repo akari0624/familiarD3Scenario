@@ -3,6 +3,13 @@
 (function () {
   'use strict';
 
+  var LengendIconEnum;
+
+  (function (LengendIconEnum) {
+    LengendIconEnum["bar"] = "bar";
+    LengendIconEnum["line"] = "line";
+  })(LengendIconEnum || (LengendIconEnum = {}));
+
   var xhtml = "http://www.w3.org/1999/xhtml";
 
   var namespaces = {
@@ -5832,8 +5839,6 @@
     return LineCharts;
   }();
 
-  var threeColorForPirChart = ordinal().range(['#ff7f50', '#7f55d4', '#6fbfad']);
-
   var getArcTween = function getArcTween(arc_layout, _current) {
     return function (b) {
       var i = D3Interpolate(_current, b);
@@ -5850,6 +5855,7 @@
     function PieCharts(svgDom) {
       this.pieInnerRadius = 0;
       this.isFirstBind = true;
+      this.colorsForPirChart = ordinal().range(['#ff7f50', '#7f55d4', '#6fbfad']);
       this.svgDom = svgDom;
       var box = getClientRectWidthAndHeight(svgDom);
       this.svgWidth = box.width;
@@ -5874,6 +5880,15 @@
       });
       this.arcTweenFunc = getArcTween(this.arcFunc, 0);
     };
+    /**
+     *
+     * @param {string[]} hexColorStrArr 要使用的顏色，必須是hex16進制格式 #開頭
+     */
+
+
+    PieCharts.prototype.setColorRangeArr = function (hexColorStrArr) {
+      this.colorsForPirChart = ordinal().range(hexColorStrArr);
+    };
 
     PieCharts.prototype.appendOutWrapperGAndSetTheStartDrawCenter = function () {
       if (this.isFirstBind) {
@@ -5887,16 +5902,20 @@
     };
 
     PieCharts.prototype.doEnter = function () {
+      var _this = this;
+
       this.newEnterGs = this.dataBinds.enter().append('g').attr('class', 'arc');
       this.newEnterGs.append('path').attr('d', this.arcFunc).attr('fill', function (d, i) {
-        return threeColorForPirChart("" + i);
+        return _this.colorsForPirChart("" + i);
       }).transition().duration(750).attrTween('d', this.arcTweenFunc);
     };
 
     PieCharts.prototype.doUpdate = function () {
+      var _this = this;
+
       this.theWholeWrapperG.selectAll('.arc') // the g
       .select('path').attr('d', this.arcFunc).attr('fill', function (d, i) {
-        return threeColorForPirChart("" + i);
+        return _this.colorsForPirChart("" + i);
       }).transition().duration(750).attrTween('d', this.arcTweenFunc);
     };
 
@@ -5942,9 +5961,55 @@
     return ToolTip;
   }();
 
+  var Legend =
+  /** @class */
+  function () {
+    function Legend(svgDom) {
+      this.svgDomRef = svgDom;
+      var box = getClientRectWidthAndHeight(svgDom);
+      this.svgWidth = box.width;
+      this.svgHeight = box.height;
+      this.d3ishSVG = D3Select(svgDom);
+      this.d3ishSVG.append('g').attr('class', 'legendWrapper');
+    }
+
+    Legend.prototype.setColorRange = function (colorArr) {
+      this.colorScale = ordinal().range(colorArr);
+    };
+
+    Legend.prototype.initD3ishSVG = function () {
+      if (!this.d3ishSVG) {
+        this.d3ishSVG = D3Select(this.svgDomRef);
+      }
+
+      this.d3ishSVG.attr('width', this.svgWidth).attr('height', this.svgHeight).attr('transform', "translate(0, 0)");
+    };
+
+    Legend.prototype.draw = function (data) {
+      // legend區 做update, exit動畫的機率不高，真的資料有變動的話，乾脆清掉重畫最快
+      this.d3ishSVG.select('.legendWrapper').selectAll('g').remove();
+      var dataBinds = this.d3ishSVG.select('.legendWrapper').selectAll('g').data(data);
+      var enterLegendWrapperGs = dataBinds.enter().append('g').attr('class', 'legendWrapper');
+      var colorFunc = this.colorScale;
+      enterLegendWrapperGs.each(function (d, i) {
+        var currG = D3Select(this);
+        var currY = 30 * i;
+        currG.append('rect').attr('width', 20).attr('height', 18).attr('x', 0).attr('y', currY).style('fill', function () {
+          return colorFunc(i);
+        });
+        currG.append('text').attr('x', 25).attr('y', currY + 15).text(function (d) {
+          return d.text;
+        }).style('text-anchor', 'start');
+      });
+    };
+
+    return Legend;
+  }();
+
   function familiarD3Scenario() {
     return {
       ToolTip: ToolTip,
+      Legend: Legend,
       BarChart: BarCharts,
       LineChart: LineCharts,
       PieChart: PieCharts
@@ -6303,21 +6368,55 @@
   }];
   pieChart1.initD3ishSVG();
   pieChart1.draw(testPieChartData);
+  var tColorRangeArr = ['#29bc69', '#102d6d', '#cd1dd3', '#9b0806'];
   var svgDom3 = document.getElementById('svg3');
   var barChart2 = new fD3Module.BarChart(svgDom3);
   barChart2.initD3ishSVG();
   barChart2.setLeftYAxisText('案件數');
-  barChart2.setColorRangeArr(['#29bc69', '#102d6d', '#cd1dd3', '#9b0806']);
+  barChart2.setColorRangeArr(tColorRangeArr);
   barChart2.draw(testData);
   var svgDom4 = document.getElementById('svg4');
   var lineChart2 = new fD3Module.LineChart(svgDom4);
   lineChart2.draw(linesData);
+  var legendSVG = document.getElementById('lengendSvg');
+  var legend1 = new fD3Module.Legend(legendSVG);
+  legend1.setColorRange(tColorRangeArr);
+  var legend1Data = [{
+    text: '套房',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar
+  }, {
+    text: '區分建物',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar
+  }, {
+    text: '土地',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar
+  }];
+  var legend1Data_2 = [{
+    text: '星野源',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar
+  }, {
+    text: '偽明',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar
+  }, {
+    text: '細野晴臣',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar
+  }];
+  legend1.draw(legend1Data);
   setTimeout(function () {
     barChart1.draw(barTestData2);
     barChart2.draw(barTestData2);
     var linesData2 = transToLineData(barTestData2);
     lineChart1.draw(linesData2.slice(0, 2));
+    pieChart1.setColorRangeArr(['#29bc69', '#102d6d', '#cd1dd3', '#9b0806']);
     pieChart1.draw(testPieChartData.slice(0, 2));
+    legend1.setColorRange(['#db061b', '#665e5f', '#d8a817']);
+    legend1.draw(legend1Data_2);
   }, 3000);
   setTimeout(function () {
     barChart1.draw(barTestData3);
