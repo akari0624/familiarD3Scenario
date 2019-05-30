@@ -71,6 +71,6 @@ npm install    # install all the 3rd-Party dependencies
     - onMouseOut
       - barChart已完成
   - ~~exit, update~~
-  - legend區
+  - ~~legend區~~
   - ~~toolTip (搭配onMouseOver, onMouseOut)~~
 
