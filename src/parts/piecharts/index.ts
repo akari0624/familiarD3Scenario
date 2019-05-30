@@ -5,11 +5,6 @@ import { interpolate as D3Interpolate } from 'd3-interpolate'
 import { ArcInPieDataType } from '../../types'
 import { getClientRectWidthAndHeight } from '../utils'
 
-
-
-
-const threeColorForPirChart = scaleOrdinal<string>().range(['#ff7f50', '#7f55d4', '#6fbfad'])
-
 const getArcTween = (
   arc_layout: Arc<any, PieArcDatum<ArcInPieDataType>>,
   _current: number,
@@ -37,6 +32,8 @@ export class PieCharts {
   newEnterGs: Selection<BaseType, PieArcDatum<ArcInPieDataType>, BaseType, any>
   arcTweenFunc: (b: any) => (t: any) => string
   isFirstBind: boolean = true
+  colorsForPirChart = scaleOrdinal<string>().range(['#ff7f50', '#7f55d4', '#6fbfad'])
+
 
   constructor(svgDom: HTMLOrSVGElement) {
     this.svgDom = svgDom
@@ -77,6 +74,14 @@ export class PieCharts {
 
   }
 
+  /**
+   *
+   * @param {string[]} hexColorStrArr 要使用的顏色，必須是hex16進制格式 #開頭
+   */
+  setColorRangeArr(hexColorStrArr: string[]) {
+    this.colorsForPirChart = scaleOrdinal<string>().range(hexColorStrArr)
+  }
+
 
   appendOutWrapperGAndSetTheStartDrawCenter() {
     if(this.isFirstBind){
@@ -106,7 +111,7 @@ export class PieCharts {
       .append('path')
       .attr('d', this.arcFunc)
       .attr('fill', (d, i: number) => {
-        return threeColorForPirChart(`${i}`);
+        return this.colorsForPirChart(`${i}`);
       })
       .transition()
       .duration(750)
@@ -119,7 +124,7 @@ export class PieCharts {
     .select('path')
     .attr('d', this.arcFunc)
       .attr('fill', (d, i: number) => {
-        return threeColorForPirChart(`${i}`);
+        return this.colorsForPirChart(`${i}`);
       })
       .transition()
       .duration(750)

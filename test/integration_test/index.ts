@@ -265,6 +265,7 @@ setTimeout(() => {
   barChart2.draw(barTestData2)
   const linesData2 = transToLineData(barTestData2)
   lineChart1.draw(linesData2.slice(0, 2))
+  pieChart1.setColorRangeArr(['#29bc69', '#102d6d', '#cd1dd3', '#9b0806'])
   pieChart1.draw(testPieChartData.slice(0, 2))
 }, 3000)
 
