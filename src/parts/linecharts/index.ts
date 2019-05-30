@@ -49,12 +49,10 @@ const lineFunc = (instance: LineCharts) =>
         instance.xScaleBand(d.date) +
         instance.xScaleBand.bandwidth() / 2 +
         (instance.margin.left + instance.margin.right) / 2
-      //  console.log('x1', x1)
       return x1
     })
     .y((d: LinePointDataType) => {
       const y1 = instance.yMaxScaleLinear(d.value)
-      //  console.log('y1', y1)
       return y1
     })
 
