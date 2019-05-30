@@ -282,6 +282,25 @@ const legend1Data: LengendDataType[] = [
     iconType: LengendIconEnum.bar,
   },
 ]
+
+const legend1Data_2: LengendDataType[] = [
+  {
+    text: '星野源',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar,
+  },
+  {
+    text: '偽明',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar,
+  },
+  {
+    text: '細野晴臣',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar,
+  },
+]
+
 legend1.draw(legend1Data)
 
 setTimeout(() => {
@@ -291,6 +310,9 @@ setTimeout(() => {
   lineChart1.draw(linesData2.slice(0, 2))
   pieChart1.setColorRangeArr(['#29bc69', '#102d6d', '#cd1dd3', '#9b0806'])
   pieChart1.draw(testPieChartData.slice(0, 2))
+
+  legend1.setColorRange(['#db061b', '#665e5f', '#d8a817'])
+  legend1.draw(legend1Data_2)
 }, 3000)
 
 setTimeout(() => {

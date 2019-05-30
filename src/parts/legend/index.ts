@@ -39,10 +39,15 @@ export class Legend {
   }
 
   draw(data: LengendDataType[]) {
+
+    // legend區 做update, exit動畫的機率不高，真的資料有變動的話，乾脆清掉重畫最快
+    this.d3ishSVG.select<SVGGElement>('.legendWrapper').selectAll('g').remove()
+
     const dataBinds: Selection<BaseType, LengendDataType, SVGGElement, any>
      = this.d3ishSVG.select<SVGGElement>('.legendWrapper').selectAll('g').data(data)
 
-   const enterLegendWrapperGs = dataBinds.enter().append<SVGGElement>('g')
+
+   const enterLegendWrapperGs = dataBinds.enter().append<SVGGElement>('g').attr('class', 'legendWrapper')
     const colorFunc = this.colorScale
     enterLegendWrapperGs.each(function (d, i) {
      
