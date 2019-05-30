@@ -31,3 +31,14 @@ export interface ArcInPieDataType {
   name: string,
   value: number,
 }
+
+export enum LengendIconEnum {
+  bar = 'bar',
+  line = 'line',
+}
+
+export interface LengendDataType {
+  text: string
+  hexColorStr: string
+  iconType: LengendIconEnum
+}
