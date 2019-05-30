@@ -1,4 +1,4 @@
-import { BarChartDataType } from '../../src/types'
+import { BarChartDataType, LengendDataType, LengendIconEnum } from '../../src/types'
 import familiarD3Scenario from '../../src'
 
 
@@ -249,16 +249,40 @@ const testPieChartData = [
 pieChart1.initD3ishSVG()
 pieChart1.draw(testPieChartData)
 
+const tColorRangeArr = ['#29bc69', '#102d6d', '#cd1dd3', '#9b0806']
+
 const svgDom3 = document.getElementById('svg3')
 const barChart2 = new fD3Module.BarChart(svgDom3)
 barChart2.initD3ishSVG()
 barChart2.setLeftYAxisText('案件數')
-barChart2.setColorRangeArr(['#29bc69', '#102d6d', '#cd1dd3', '#9b0806'])
+barChart2.setColorRangeArr(tColorRangeArr)
 barChart2.draw(testData)
 
 const svgDom4 = document.getElementById('svg4')
 const lineChart2 = new fD3Module.LineChart(svgDom4)
 lineChart2.draw(linesData)
+
+const legendSVG = document.getElementById('lengendSvg')
+const legend1 = new fD3Module.Legend(legendSVG)
+legend1.setColorRange(tColorRangeArr)
+const legend1Data: LengendDataType[] = [
+  {
+    text: '套房',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar,
+  },
+  {
+    text: '區分建物',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar,
+  },
+  {
+    text: '土地',
+    hexColorStr: '',
+    iconType: LengendIconEnum.bar,
+  },
+]
+legend1.draw(legend1Data)
 
 setTimeout(() => {
   barChart1.draw(barTestData2)
