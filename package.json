@@ -19,7 +19,8 @@
     "clean": "rimraf dist/*",
     "rollup_dist": "npm run clean && rollup -c",
     "rollup_dev": "rollup -c -w",
-    "integration_test": "npm run rollup_dist && open index.html "
+    "integration_test": "npm run rollup_dist && open index.html ",
+    "only_ghPage": "gh-pages -d dist"
   },
   "author": "",
   "license": "ISC",

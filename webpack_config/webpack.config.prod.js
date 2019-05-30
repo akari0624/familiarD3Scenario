@@ -20,7 +20,7 @@ module.exports = {
   entry: WEBPACK_Config_Base.ENTRY_POINT,
   output: {
     path: path.join(__dirname, '../', 'dist'),
-    publicPath: '/', // your webApp name(if has) on server put here.   eg:/MyWebApp
+    publicPath: '/familiarD3Scenario', // your webApp name(if has) on server put here.   eg:/MyWebApp
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[chunkhash].js'
   },
