@@ -35,7 +35,7 @@ export class Legend {
     this.d3ishSVG
       .attr('width', this.svgWidth)
       .attr('height', this.svgHeight)
-    //  .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`)
+      .attr('transform', `translate(0, 0)`)
   }
 
   draw(data: LengendDataType[]) {
@@ -47,7 +47,7 @@ export class Legend {
     enterLegendWrapperGs.each(function (d, i) {
      
       const currG = D3Select<SVGGElement, LengendDataType>(this)
-      const currY = (18 + 2) * (i + 1)
+      const currY = 30 * i
       currG.append('rect')
         .attr('width', 20)
         .attr('height', 18)
@@ -59,7 +59,7 @@ export class Legend {
 
       currG.append('text')
         .attr('x', 25)
-        .attr('y', currY)
+        .attr('y', currY + 15)
         .text(d => d.text)
         .style('text-anchor', 'start')
     })
