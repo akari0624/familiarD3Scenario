@@ -10,6 +10,13 @@
     LengendIconEnum["line"] = "line";
   })(LengendIconEnum || (LengendIconEnum = {}));
 
+  var LegendPresentTypeEnum;
+
+  (function (LegendPresentTypeEnum) {
+    LegendPresentTypeEnum["portrait"] = "portrait";
+    LegendPresentTypeEnum["landscape"] = "landscape";
+  })(LegendPresentTypeEnum || (LegendPresentTypeEnum = {}));
+
   var xhtml = "http://www.w3.org/1999/xhtml";
 
   var namespaces = {
@@ -1003,6 +1010,25 @@
       }
     }
     return max;
+  }
+
+  function sum(values, valueof) {
+    let sum = 0;
+    if (valueof === undefined) {
+      for (let value of values) {
+        if (value = +value) {
+          sum += value;
+        }
+      }
+    } else {
+      let index = -1;
+      for (let value of values) {
+        if (value = +valueof(value, ++index, values)) {
+          sum += value;
+        }
+      }
+    }
+    return sum;
   }
 
   function initRange(domain, range) {
@@ -5965,11 +5991,15 @@
   /** @class */
   function () {
     function Legend(svgDom) {
+      this.rectInLegendWidth = 20;
+      this.rectInLegendHeight = 18;
+      this.rectAndTextBetween = 5;
+      this.gLeftPadding = 10;
       this.svgDomRef = svgDom;
       var box = getClientRectWidthAndHeight(svgDom);
       this.svgWidth = box.width;
       this.svgHeight = box.height;
-      this.d3ishSVG = D3Select(svgDom);
+      this.initD3ishSVG();
       this.d3ishSVG.append('g').attr('class', 'legendWrapper');
     }
 
@@ -5983,23 +6013,80 @@
       }
 
       this.d3ishSVG.attr('width', this.svgWidth).attr('height', this.svgHeight).attr('transform', "translate(0, 0)");
+      this.portraitOrLandscape();
+    };
+
+    Legend.prototype.portraitOrLandscape = function () {
+      if (this.svgWidth <= this.svgHeight) {
+        this.presentType = LegendPresentTypeEnum.portrait;
+      } else {
+        this.presentType = LegendPresentTypeEnum.landscape;
+      }
+    };
+
+    Legend.prototype.prepareScale = function (data) {
+      if (this.presentType === LegendPresentTypeEnum.portrait) {
+        this.legendScale = band().range([0, this.svgHeight]).domain(data.map(function (d) {
+          return d.text;
+        }));
+      } else if (this.presentType === LegendPresentTypeEnum.landscape) {
+        var dLen = data.length;
+
+        var _a = this,
+            rectInLegendWidth = _a.rectInLegendWidth,
+            rectAndTextBetween = _a.rectAndTextBetween,
+            gLeftPadding = _a.gLeftPadding,
+            svgWidth = _a.svgWidth;
+
+        var toDedutct = rectInLegendWidth * dLen + rectAndTextBetween * dLen + gLeftPadding * (dLen - 1);
+        var allTextLength = data.map(function (d) {
+          return d.text.length;
+        });
+        this.legendScale = linear$1().range([0, svgWidth - toDedutct]).domain([0, sum(allTextLength)]);
+      }
     };
 
     Legend.prototype.draw = function (data) {
       // legend區 做update, exit動畫的機率不高，真的資料有變動的話，乾脆清掉重畫最快
       this.d3ishSVG.select('.legendWrapper').selectAll('g').remove();
       var dataBinds = this.d3ishSVG.select('.legendWrapper').selectAll('g').data(data);
+      this.prepareScale(data);
       var enterLegendWrapperGs = dataBinds.enter().append('g').attr('class', 'legendWrapper');
       var colorFunc = this.colorScale;
+      var legendPresentType = this.presentType;
+      var legendScaleBand = this.legendScale;
+
+      var _a = this,
+          rectInLegendWidth = _a.rectInLegendWidth,
+          rectInLegendHeight = _a.rectInLegendHeight;
+
+      var _b = this,
+          rectAndTextBetween = _b.rectAndTextBetween,
+          gLeftPadding = _b.gLeftPadding;
+
       enterLegendWrapperGs.each(function (d, i) {
         var currG = D3Select(this);
-        var currY = 30 * i;
-        currG.append('rect').attr('width', 20).attr('height', 18).attr('x', 0).attr('y', currY).style('fill', function () {
-          return colorFunc(i);
-        });
-        currG.append('text').attr('x', 25).attr('y', currY + 15).text(function (d) {
-          return d.text;
-        }).style('text-anchor', 'start');
+
+        if (legendPresentType === LegendPresentTypeEnum.portrait) {
+          currG.append('rect').attr('width', rectInLegendWidth).attr('height', rectInLegendHeight).attr('x', 0).attr('y', legendScaleBand(d.text)).style('fill', function () {
+            return colorFunc(i);
+          });
+          currG.append('text').attr('x', 25).attr('y', legendScaleBand(d.text) + rectInLegendHeight - 4).text(function (d) {
+            return d.text;
+          }).style('text-anchor', 'start');
+        } else if (legendPresentType === LegendPresentTypeEnum.landscape) {
+          var estimatedTextWidth = i === 0 ? 0 : legendScaleBand(sum(data.slice(0, i).map(function (d) {
+            return d.text.length;
+          })));
+          var currRectX = (rectInLegendWidth + rectAndTextBetween + gLeftPadding) * i + estimatedTextWidth;
+          var currTextX = (rectInLegendWidth + rectAndTextBetween) * (i + 1) + gLeftPadding * i + estimatedTextWidth;
+          currG.append('rect').attr('width', rectInLegendWidth).attr('height', rectInLegendHeight).attr('x', currRectX).attr('y', 3).style('fill', function () {
+            return colorFunc(i);
+          });
+          currG.append('text').attr('x', currTextX).attr('y', rectInLegendHeight).text(function (d) {
+            return d.text;
+          }).style('text-anchor', 'start');
+        }
       });
     };
 

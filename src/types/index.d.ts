@@ -29,6 +29,10 @@ export declare enum LengendIconEnum {
     bar = "bar",
     line = "line"
 }
+export declare enum LegendPresentTypeEnum {
+    portrait = "portrait",
+    landscape = "landscape"
+}
 export interface LengendDataType {
     text: string;
     hexColorStr: string;
