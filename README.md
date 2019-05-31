@@ -20,8 +20,9 @@ barChart1.setOnRectClick( function(d){console.log(d)})
 barChart1.draw(testData)
 ```
 
-[詳細使用範例請先暫看](test/integration_test/index.ts)
+- [詳細使用範例請先暫看](test/integration_test/index.ts)
 
+- [codepen playground](https://codepen.io/morris0987/pen/arQVoM?editors=1010)
 
 ### 參與開發
 
