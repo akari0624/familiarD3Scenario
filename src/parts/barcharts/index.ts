@@ -20,50 +20,6 @@ import {
 import { getClientRectWidthAndHeight } from '../utils'
 import { flatMap } from '../../utils'
 
-function drawBottomXAxis(instance: BarCharts): void {
-  const { svgHeight, d3ishSVG, xScaleBandG, margin, isFirstDraw } = instance
-
-  if (isFirstDraw) {
-    d3ishSVG
-      .append('g')
-      .attr('class', 'x_axis')
-      .attr(
-        'transform',
-        `translate(${margin.left}, ${svgHeight - margin.bottom})`
-      )
-      .call(axisBottom(xScaleBandG))
-  } else {
-    d3ishSVG
-      .select('.x_axis')
-      .attr(
-        'transform',
-        `translate(${margin.left}, ${svgHeight - margin.bottom})`
-      )
-      .call(axisBottom(xScaleBandG))
-  }
-}
-
-function drawLeftYAxis(instance: BarCharts): void {
-  const { yScaleLinear, d3ishSVG, isFirstDraw, margin } = instance
-
-  if (isFirstDraw) {
-    d3ishSVG
-      .append('g')
-      .attr('class', 'y_axis_left')
-      .attr('transform', `translate(${margin.left}, 0)`)
-      .call(axisLeft(yScaleLinear).ticks(5))
-      .append('text')
-      .style('fill', 'steelblue') // fill the text with the colour black
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 6)
-      .attr('dy', '.71em')
-      .style('text-anchor', 'end')
-      .text(`${instance.leftYAxisText}`)
-  } else {
-    d3ishSVG.select('.y_axis_left').call(axisLeft(yScaleLinear).ticks(5))
-  }
-}
-
 const wrapRect_G_ClassName = '.state'
 const wrapRect_G_ClassNameWithoutDot = wrapRect_G_ClassName.substring(
   1,
@@ -102,28 +58,28 @@ const addMouseoutOnNewEnterRect = (newEnterGsThatWrapTheRects: Selection<BaseTyp
   * BarChart 柱狀圖的class
   */
 export class BarCharts {
-  svgDom: HTMLOrSVGElement
-  d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
-  data: BarChartDataType[]
-  margin: marginInPX = { top: 20, right: 40, bottom: 40, left: 40 }
-  svgWidth: number
-  svgHeight: number
+  private svgDom: HTMLOrSVGElement
+  private d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
+  private data: BarChartDataType[]
+  private margin: marginInPX = { top: 20, right: 40, bottom: 40, left: 40 }
+  private svgWidth: number
+  private svgHeight: number
 
-  xScaleBandG: ScaleBand<string>
-  xScaleBandRect: ScaleBand<string>
+  private xScaleBandG: ScaleBand<string>
+  private xScaleBandRect: ScaleBand<string>
 
-  yScaleLinear: ScaleLinear<number, number>
-  yMaxScaleLinear: ScaleLinear<number, number>
+  private yScaleLinear: ScaleLinear<number, number>
+  private yMaxScaleLinear: ScaleLinear<number, number>
 
-  tColors: ScaleOrdinal<string, string>
-  dataBinds: Selection<BaseType, BarChartDataType, SVGGElement, any>
-  newEnterGsThatWrapTheRects: Selection<BaseType, BarChartDataType, SVGGElement, any>
-  theNewEnterBarsRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>
-  isFirstDraw: boolean = true
-  onRectClick: (data: BarCategoryDataType) => void
-  categoryLength: number
-  leftYAxisText: string = ''
-  colorRangeArr: string[] = [
+  private tColors: ScaleOrdinal<string, string>
+  private dataBinds: Selection<BaseType, BarChartDataType, SVGGElement, any>
+  private newEnterGsThatWrapTheRects: Selection<BaseType, BarChartDataType, SVGGElement, any>
+  private theNewEnterBarsRects: Selection<BaseType, BarCategoryDataType, BaseType, BarChartDataType>
+  private isFirstDraw: boolean = true
+  private onRectClick: (data: BarCategoryDataType) => void
+  private categoryLength: number
+  private leftYAxisText: string = ''
+  private colorRangeArr: string[] = [
     '#FFF279',
     '#FFFF00',
     '#7b6888',
@@ -132,8 +88,8 @@ export class BarCharts {
     '#d0743c',
     '#ff8c00',
   ]
-   onRectMouseOver: (data: BarCategoryDataType, pageX: number, pageY: number) => void
-   onRectMouseOut: () => void
+  private onRectMouseOver: (data: BarCategoryDataType, pageX: number, pageY: number) => void
+  private onRectMouseOut: () => void
 
   /**
    *
@@ -185,7 +141,7 @@ export class BarCharts {
     this.colorRangeArr = hexColorStrArr
   }
 
-  _prepareAxisAndScale = () => {
+  private _prepareAxisAndScale = () => {
     const { svgWidth: width, svgHeight: height, data, margin } = this
 
     //  給g用的
@@ -215,13 +171,13 @@ export class BarCharts {
     
   }
 
-  bindDataToG() {
+  private bindDataToG() {
     this.dataBinds = this.d3ishSVG
       .selectAll(wrapRect_G_ClassName)
       .data(this.data)
   }
 
-  enter_drawNewGsThatToWrapTheRect() {
+  private enter_drawNewGsThatToWrapTheRect() {
     // 包住 rect的 g
     this.newEnterGsThatWrapTheRects = this.dataBinds
       .enter()
@@ -245,7 +201,7 @@ export class BarCharts {
     this.onRectMouseOut = onMouseOutFromUser
   }
 
-  drawNewEnterRectInTheGs = () => {
+  private drawNewEnterRectInTheGs = () => {
     this.theNewEnterBarsRects = this.newEnterGsThatWrapTheRects
       .selectAll('rect')
       .data(d => d.categories)
@@ -258,7 +214,7 @@ export class BarCharts {
       .on('click', this.onRectClick)
   }
 
-  setRectTransition = () => {
+  private setRectTransition = () => {
     this.theNewEnterBarsRects
       .transition()
       .duration(1000)
@@ -270,7 +226,7 @@ export class BarCharts {
       )
   }
 
-  update_updateExistedBar = () => {
+  private update_updateExistedBar = () => {
     // 移動g
     this.dataBinds.attr('transform', d => {
       const result = this.xScaleBandG(d.date)
@@ -294,7 +250,7 @@ export class BarCharts {
       )
   }
 
-  exit_removeNoDataCorrespondedBar = () => {
+  private exit_removeNoDataCorrespondedBar = () => {
     //  再給資料然後 再比對rect一次  刪掉沒有資料對應的rect
     const existingRect = this.dataBinds
       .selectAll('rect')
@@ -321,14 +277,60 @@ export class BarCharts {
    
   }
 
+  private drawLeftYAxis(): void {
+    const { yScaleLinear, d3ishSVG, isFirstDraw, margin, leftYAxisText } = this
+   
+  
+  
+    if (isFirstDraw) {
+      d3ishSVG
+        .append('g')
+        .attr('class', 'y_axis_left')
+        .attr('transform', `translate(${margin.left}, 0)`)
+        .call(axisLeft(yScaleLinear).ticks(5))
+        .append('text')
+        .style('fill', 'steelblue') // fill the text with the colour black
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 6)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'end')
+        .text(`${leftYAxisText}`)
+    } else {
+      d3ishSVG.select('.y_axis_left').call(axisLeft(yScaleLinear).ticks(5))
+    }
+  }
+
+  private drawBottomXAxis(): void {
+    const { svgHeight, d3ishSVG, xScaleBandG, margin, isFirstDraw } = this
+  
+    if (isFirstDraw) {
+      d3ishSVG
+        .append('g')
+        .attr('class', 'x_axis')
+        .attr(
+          'transform',
+          `translate(${margin.left}, ${svgHeight - margin.bottom})`
+        )
+        .call(axisBottom(xScaleBandG))
+    } else {
+      d3ishSVG
+        .select('.x_axis')
+        .attr(
+          'transform',
+          `translate(${margin.left}, ${svgHeight - margin.bottom})`
+        )
+        .call(axisBottom(xScaleBandG))
+    }
+  }
+
   draw = (data: BarChartDataType[]) => {
     this.data = data
     this.categoryLength = data[0].categories.length
 
     this._prepareAxisAndScale()
 
-    drawBottomXAxis(this)
-    drawLeftYAxis(this)
+    this.drawBottomXAxis()
+    this.drawLeftYAxis()
     if (this.isFirstDraw) {
       this.isFirstDraw = false
     }

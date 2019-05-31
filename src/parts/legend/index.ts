@@ -7,18 +7,18 @@ import { LengendDataType, LengendIconEnum, LegendPresentTypeEnum } from '../../t
 
 export class Legend {
 
-  svgDomRef: HTMLOrSVGElement
-  svgWidth: number
-  svgHeight: number
-  d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
-  colorScale: ScaleOrdinal<number, string>
-  presentType: LegendPresentTypeEnum
-  legendScale: ScaleBand<string> | ScaleLinear<number, number>
+  private svgDomRef: HTMLOrSVGElement
+  private svgWidth: number
+  private svgHeight: number
+  private d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
+  private colorScale: ScaleOrdinal<number, string>
+  private presentType: LegendPresentTypeEnum
+  private legendScale: ScaleBand<string> | ScaleLinear<number, number>
 
-  rectInLegendWidth = 20
-  rectInLegendHeight = 18
-  rectAndTextBetween = 5
-  gLeftPadding = 10
+  private rectInLegendWidth = 20
+  private rectInLegendHeight = 18
+  private rectAndTextBetween = 5
+  private gLeftPadding = 10
 
   constructor(svgDom: HTMLOrSVGElement) {
     this.svgDomRef = svgDom
@@ -35,7 +35,7 @@ export class Legend {
     this.colorScale = scaleOrdinal<number, string>().range(colorArr)
   }
 
-  initD3ishSVG() {
+  private initD3ishSVG() {
     if (!this.d3ishSVG) {
       this.d3ishSVG = D3Select<SVGSVGElement, LengendDataType[]>(this
         .svgDomRef as any)
@@ -49,7 +49,7 @@ export class Legend {
       this.portraitOrLandscape()
   }
 
-  portraitOrLandscape() {
+  private portraitOrLandscape() {
 
     if (this.svgWidth <= this.svgHeight) {
       this.presentType = LegendPresentTypeEnum.portrait
@@ -58,7 +58,7 @@ export class Legend {
     }
   }
 
-  prepareScale(data: LengendDataType[]) {
+  private prepareScale(data: LengendDataType[]) {
 
     if (this.presentType === LegendPresentTypeEnum.portrait) {
       this.legendScale = scaleBand()
@@ -97,9 +97,8 @@ export class Legend {
      
       const currG = D3Select<SVGGElement, LengendDataType>(this)
       
-if(legendPresentType === LegendPresentTypeEnum.portrait) {
-      const currYPortraitMode = 30 * i
-      currG.append('rect')
+      if(legendPresentType === LegendPresentTypeEnum.portrait) {
+        currG.append('rect')
         .attr('width', rectInLegendWidth)
         .attr('height', rectInLegendHeight)
         .attr('x', 0)
@@ -115,7 +114,6 @@ if(legendPresentType === LegendPresentTypeEnum.portrait) {
         .style('text-anchor', 'start')
       }else if (legendPresentType === LegendPresentTypeEnum.landscape) {
         const estimatedTextWidth =  i === 0 ? 0 : (legendScaleBand as ScaleLinear<number, number>)(sum(data.slice(0, i).map(d => d.text.length)))
-        
         const currRectX = (rectInLegendWidth + rectAndTextBetween +  gLeftPadding) * i + estimatedTextWidth
         const currTextX = (rectInLegendWidth + rectAndTextBetween) * (i + 1) + (gLeftPadding * i) + estimatedTextWidth
         currG.append('rect')
@@ -126,7 +124,6 @@ if(legendPresentType === LegendPresentTypeEnum.portrait) {
           .style('fill', () => {
             return colorFunc(i);
           })
-  
         currG.append('text')
           .attr('x', currTextX)
           .attr('y',  rectInLegendHeight)

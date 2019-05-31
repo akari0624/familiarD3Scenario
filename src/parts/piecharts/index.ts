@@ -18,21 +18,21 @@ const getArcTween = (
 
 export class PieCharts {
 
-  svgDom: HTMLOrSVGElement
-  d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
-  data: ArcInPieDataType[]
-  svgWidth: number
-  svgHeight: number
-  pieRadius: number
-  pieInnerRadius: number = 0
-  arcFunc: Arc<BaseType, PieArcDatum<ArcInPieDataType>>
-  pieLayout: Pie<any, ArcInPieDataType>
-  theWholeWrapperG: Selection<BaseType, any, HTMLElement, any>
-  dataBinds: Selection<BaseType, PieArcDatum<ArcInPieDataType>, BaseType, any>
-  newEnterGs: Selection<BaseType, PieArcDatum<ArcInPieDataType>, BaseType, any>
-  arcTweenFunc: (b: any) => (t: any) => string
-  isFirstBind: boolean = true
-  colorsForPirChart = scaleOrdinal<string>().range(['#ff7f50', '#7f55d4', '#6fbfad'])
+  private svgDom: HTMLOrSVGElement
+  private d3ishSVG: Selection<SVGGElement, any, HTMLElement, any>
+  private data: ArcInPieDataType[]
+  private svgWidth: number
+  private svgHeight: number
+  private pieRadius: number
+  private pieInnerRadius: number = 0
+  private arcFunc: Arc<BaseType, PieArcDatum<ArcInPieDataType>>
+  private pieLayout: Pie<any, ArcInPieDataType>
+  private theWholeWrapperG: Selection<BaseType, any, HTMLElement, any>
+  private dataBinds: Selection<BaseType, PieArcDatum<ArcInPieDataType>, BaseType, any>
+  private newEnterGs: Selection<BaseType, PieArcDatum<ArcInPieDataType>, BaseType, any>
+  private arcTweenFunc: (b: any) => (t: any) => string
+  private isFirstBind: boolean = true
+  private colorsForPirChart = scaleOrdinal<string>().range(['#ff7f50', '#7f55d4', '#6fbfad'])
 
 
   constructor(svgDom: HTMLOrSVGElement) {
@@ -58,7 +58,7 @@ export class PieCharts {
     this.d3ishSVG = d3ishSvgFromOtherChart
   }
 
-  initNeededFunc() {
+  private initNeededFunc() {
 
     this.arcFunc = arc<PieArcDatum<ArcInPieDataType>>()
     .innerRadius(this.pieInnerRadius)
@@ -83,7 +83,7 @@ export class PieCharts {
   }
 
 
-  appendOutWrapperGAndSetTheStartDrawCenter() {
+  private appendOutWrapperGAndSetTheStartDrawCenter() {
     if(this.isFirstBind){
       this.theWholeWrapperG =
         this.d3ishSVG
@@ -94,14 +94,14 @@ export class PieCharts {
     }
   }
 
-  startToBindBeforeEnter() {
+  private startToBindBeforeEnter() {
     this.dataBinds =
     this.theWholeWrapperG
     .selectAll('.arc')
     .data(this.pieLayout(this.data))
   }
 
-  doEnter() {
+  private doEnter() {
     this.newEnterGs = this.dataBinds
       .enter()
       .append('g')
@@ -118,7 +118,7 @@ export class PieCharts {
       .attrTween('d', this.arcTweenFunc)
   }
 
-  doUpdate() {
+  private doUpdate() {
     this.theWholeWrapperG
     .selectAll('.arc')   // the g
     .select('path')
@@ -131,7 +131,7 @@ export class PieCharts {
       .attrTween('d', this.arcTweenFunc)
   }
 
-  doExitRemove() {
+  private doExitRemove() {
     this.dataBinds.exit().remove()
   }
 

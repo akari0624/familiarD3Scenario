@@ -14,9 +14,9 @@ const getStyleTween = (lastX: number, lastY: number, newX: number, newY: number)
 
 export class ToolTip {
 
-  toolTipDivRef: Selection<BaseType, {}, HTMLElement, any>
-  lastX: number
-  lastY: number
+  private toolTipDivRef: Selection<BaseType, {}, HTMLElement, any>
+  private lastX: number
+  private lastY: number
 
   constructor() {
     this.toolTipDivRef =
