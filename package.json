@@ -5,10 +5,10 @@
   "main": "index.js",
   "repository": "https://github.com/akari0624/react-starter_withTypeScript",
   "scripts": {
-    "dev": "webpack-dev-server --public-host --config ./webpack_config/webpack.config.dev.js --mode development ",
-    "devWithBabel": "NODE_ENV=withBabel webpack-dev-server --public-host --config ./webpack_config/webpack.config.dev.js --mode development ",
-    "fastbuild_dev": "webpack-dev-server --public-host --config ./webpack_config/webpack.config.dev.fastbuild.js --mode development ",
-    "fastbuild_devWithBabel": "NODE_ENV=withBabel webpack-dev-server --public-host --config ./webpack_config/webpack.config.dev.fastbuild.js --mode development ",
+    "dev": "webpack-dashboard -- webpack-dev-server --public-host --config ./webpack_config/webpack.config.dev.js --mode development ",
+    "devWithBabel": "NODE_ENV=withBabel webpack-dashboard -- webpack-dev-server --public-host --config ./webpack_config/webpack.config.dev.js --mode development ",
+    "fastbuild_dev": "webpack-dashboard -- webpack-dev-server --public-host --config ./webpack_config/webpack.config.dev.fastbuild.js --mode development ",
+    "fastbuild_devWithBabel": "NODE_ENV=withBabel webpack-dashboard -- webpack-dev-server --public-host --config ./webpack_config/webpack.config.dev.fastbuild.js --mode development ",
     "dist": "npm run clean && production=Y webpack --config ./webpack_config/webpack.config.prod.js --progress --bail --env dist -p",
     "distWithBabel": "npm run clean && NODE_ENV=withBabel production=Y webpack --config ./webpack_config/webpack.config.prod.js --progress --bail --env dist -p",
     "deploy": "npm run dist && gh-pages -d dist",
@@ -108,6 +108,7 @@
     "webpack": "^4.31.0",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.2",
+    "webpack-dashboard": "^3.0.7",
     "webpack-dev-server": "^3.4.1"
   },
   "dependencies": {

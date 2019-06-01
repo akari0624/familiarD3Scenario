@@ -4,6 +4,8 @@ const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const WEBPACK_Config_Base = require('./webpack.config.base');
+const DashboardPlugin = require('webpack-dashboard/plugin');
+const devServerPort = 9999
 
 
 let __LOADERS_ARR;
@@ -61,12 +63,13 @@ module.exports = {
       template: path.join(__dirname, '../test/integration_test', 'index.html'),
       filename: './index.html'
     }),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new DashboardPlugin({port: devServerPort})
   ],
   resolve: WEBPACK_Config_Base.RESOLVE_SETTING_CONFIG,
   devServer: {
     historyApiFallback: true,
     contentBase: path.join(__dirname, '../'),
-    port: 9999
+    port: devServerPort
   }
 };
