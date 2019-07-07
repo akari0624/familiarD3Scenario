@@ -3,18 +3,20 @@
     "declaration": true,
     "outDir": "./dist/",
     "sourceMap": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "module": "es6",
     "target": "es5",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,  /* allow the import syntax don't need to be `import * as React from 'react'`*/
     "esModuleInterop": true,
-    "moduleResolution": "node"             /* make ts compiler include type definitions linked in package.json files*/
+    "moduleResolution": "node",             /* make ts compiler include type definitions linked in package.json files*/
+    "lib": ["es5", "es6", "es7", "es2017", "dom"],
+    "rootDirs": ["src", "stories"],
   },
   "include": [
-    "./src"
+    "./src", "./stories"
 ],
 "exclude": [
-  "node_modules"
+ "node_modules", "build", "scripts"
 ]
 }
